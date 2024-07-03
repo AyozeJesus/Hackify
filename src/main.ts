@@ -62,6 +62,10 @@ function initPrivateSection(profile?: UserProfile): void {
   document.getElementById("playlistsButton")!.addEventListener("click", () => {
     showPlaylists(profile);
   });
+
+  document.getElementById("homeButton")!.addEventListener("click", () => {
+    window.location.reload();
+  });
 }
 
 function showProfile(profile?: UserProfile): void {
@@ -290,7 +294,7 @@ function renderCategories(categories: Category[]) {
   }
   browseAllElement.innerHTML = categories
     .map((category) => {
-      return `<li>${category.name} - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
+      return `<li><a href="${category.href}">${category.name}</a> - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
     })
     .join("");
 }
@@ -337,16 +341,58 @@ function initSearchSection() {
   });
 }
 
-function renderSearchResults(results: string[]) {
+function renderSearchResults(data: any[]) {
   const searchResultsElement = document.getElementById("searchResults");
   if (!searchResultsElement) {
     throw new Error("Search results element not found");
   }
 
+  // Limpiamos el contenido previo
   searchResultsElement.innerHTML = "";
 
-  const items = results.map((result) => `<li>${result}</li>`).join("");
-  searchResultsElement.innerHTML = items;
+  // Construimos la lista de resultados
+  console.log("Rendering search results:", data);
+  const items = data
+    .map((item) => {
+      if (item.type === "track") {
+        return `<li><input type="radio" name="result" id="${item.id}" value="${
+          item.uri
+        }"> ${item.name} by ${item.artists
+          .map((artist: any) => artist.name)
+          .join(", ")}</li>`;
+      } else if (item.type === "album") {
+        return `<li><input type="radio" name="result" id="${item.id}" value="${
+          item.uri
+        }"> ${item.name} by ${item.artists
+          .map((artist: any) => artist.name)
+          .join(", ")}</li>`;
+      } else if (item.type === "artist") {
+        return `<li><input type="radio" name="result" id="${item.id}" value="${item.uri}"> ${item.name}</li>`;
+      } else if (item.type === "playlist") {
+        return `<li><input type="radio" name="result" id="${item.id}" value="${item.uri}"> ${item.name} by ${item.owner.display_name}</li>`;
+      } else {
+        return `<li><input type="radio" name="result" id="${item.id}" value="${item.uri}"> ${item.name}</li>`;
+      }
+    })
+    .join("");
+
+  searchResultsElement.innerHTML = `<ul>${items}</ul>`;
+
+  const radioInputs = searchResultsElement.querySelectorAll(
+    "input[name='result']"
+  );
+  radioInputs.forEach((input) => {
+    input.addEventListener("change", (event) => {
+      const selected = event.target as HTMLInputElement;
+      if (selected) {
+        const selectedResultUri = selected.value;
+        playTrack(selectedResultUri);
+        console.log(selected + "El Selected");
+        console.log(items + "Es items");
+        togglePlay();
+      }
+    });
+  });
 }
 
 async function initSavedTracksSection(profile?: UserProfile): Promise<void> {
