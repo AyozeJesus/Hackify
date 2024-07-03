@@ -8,10 +8,10 @@
   </head>
   <body>
     <section id="publicSection">
-      Sector publico: <br />
+      Sector público: <br />
       <button id="loginButton">Login</button>
     </section>
-    <section id="privateSection">
+    <section id="privateSection" style="display: none">
       Sector privado: <br />
       <section id="menuSection">
         <button id="profileButton">Profile</button>
@@ -19,7 +19,7 @@
         <button id="playlistsButton">Mis playlists</button>
         <button id="logoutButton">Logout</button>
       </section>
-      <section id="profileSection">
+      <section id="profileSection" style="display: none">
         <h1>Display your Spotify profile data</h1>
         <h2>Logged in as <span id="displayName"></span></h2>
         <ul>
@@ -29,18 +29,26 @@
           <li>Link: <a id="url" href="#"></a></li>
         </ul>
       </section>
-      <section id="playlistsSection">
+      <section id="playlistsSection" style="display: none">
         <p>Mis playlists:</p>
         <ul id="playlists"></ul>
         <button id="playSelectedButton">Play selected playlist</button>
       </section>
-      <section id="actionsSection">
+      <section id="actionsSection" style="display: none">
         <p>Acciones comunes:</p>
         <button id="changeButton">Cambiar track</button>
         <button id="playButton">Play/Pause</button>
       </section>
-      <section id="spotifyEmbedSection">
+      <section id="spotifyEmbedSection" style="display: none">
         <div id="embed-iframe"></div>
+      </section>
+      <section id="topGenresSection" style="display: none">
+        <h2>Your top genres</h2>
+        <ul id="genres"></ul>
+      </section>
+      <section id="browseAllSection" style="display: none">
+        <h2>Browse all</h2>
+        <ul id="browseAll"></ul>
       </section>
     </section>
   </body>
