@@ -34,6 +34,9 @@ type PlaylistRequest = {
 };
 
 type Category = {
+  href: any;
+  items: any;
+  icons: any;
   id: string;
   name: string;
 };

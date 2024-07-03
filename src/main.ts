@@ -6,6 +6,7 @@ import {
   playTrack,
   togglePlay,
   getMyTopGenres,
+  getCategories,
 } from "./api";
 
 const publicSection = document.getElementById("publicSection")!;
@@ -14,6 +15,7 @@ const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const actionsSection = document.getElementById("actionsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
+const browseAllSection = document.getElementById("browseAllSection")!;
 
 async function init() {
   let profile: UserProfile | undefined;
@@ -43,7 +45,8 @@ function initPrivateSection(profile?: UserProfile): void {
   initProfileSection(profile);
   initPlaylistSection(profile);
   initActionsSection();
-  initMyTopGenresSection(profile); // Inicializar sección de géneros aquí
+  initMyTopGenresSection(profile);
+  initBrowseAllSection();
 }
 
 function renderPrivateSection(isLogged: boolean) {
@@ -153,5 +156,36 @@ function renderMyTopGenres(topGenres: UserTopGenres) {
   }
   genresElement.innerHTML = topGenres
     .map((genre) => `<li>${genre}</li>`)
+    .join("");
+}
+
+async function initBrowseAllSection() {
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    const categories = await getCategories(accessToken!);
+    renderBrowseAllSection(true);
+    renderCategories(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+  }
+}
+
+function renderBrowseAllSection(render: boolean) {
+  const browseAllSection = document.getElementById("browseAllSection");
+  if (!browseAllSection) {
+    throw new Error("Element not found");
+  }
+  browseAllSection.style.display = render ? "block" : "none";
+}
+
+function renderCategories(categories: Category[]) {
+  const browseAllElement = document.getElementById("browseAll");
+  if (!browseAllElement) {
+    throw new Error("Element not found");
+  }
+  browseAllElement.innerHTML = categories
+    .map((category) => {
+      return `<li>${category.name} - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
+    })
     .join("");
 }
