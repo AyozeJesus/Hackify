@@ -143,7 +143,7 @@ export async function searchResults(
   token: string,
   query: string,
   type: string
-): Promise<string[]> {
+): Promise<any[]> {
   try {
     const response = await fetch(
       `${api}/v1/search?q=${encodeURIComponent(query)}&type=${type}`,
@@ -152,18 +152,20 @@ export async function searchResults(
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-
     if (!response.ok) {
-      throw new Error("Failed to fetch data");
+      const errorResponse = await response.json();
+      console.error("Error response from Spotify API:", errorResponse);
+      throw new Error(`Failed to fetch data: ${errorResponse.error.message}`);
     }
 
     const data = await response.json();
+    console.log("Search response data:", data);
 
-    const results: string[] = data[type + "s"].items.map(
-      (item: any) => item.name
-    );
+    if (!data || !data[type + "s"] || !data[type + "s"].items) {
+      throw new Error("Invalid response format from Spotify API");
+    }
 
-    return results;
+    return data[type + "s"].items;
   } catch (error) {
     console.error("Error fetching data:", error);
     throw error;
