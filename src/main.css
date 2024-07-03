@@ -4,6 +4,7 @@
 }
 
 /* hack, intencionalmente oculto, con display none no funciona */
+
 iframe {
   top: 0;
   width: 0;
@@ -11,6 +12,7 @@ iframe {
   position: absolute;
   overflow: hidden;
 }
+
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

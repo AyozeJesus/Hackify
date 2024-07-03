@@ -18,6 +18,8 @@ const actionsSection = document.getElementById("actionsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
 const browseAllSection = document.getElementById("browseAllSection")!;
 
+let selectedPlaylistUri: string | null = null;
+
 async function init() {
   let profile: UserProfile | undefined;
   try {
@@ -48,7 +50,7 @@ function initPrivateSection(profile?: UserProfile): void {
   initActionsSection();
   initMyTopGenresSection(profile);
   initBrowseAllSection();
-  initSearchSection(); // Agregado para inicializar la sección de búsqueda
+  initSearchSection();
 }
 
 function renderPrivateSection(isLogged: boolean) {
@@ -104,15 +106,50 @@ function renderPlaylistsSection(render: boolean) {
 }
 
 function renderPlaylists(playlists: PlaylistRequest) {
-  const playlist = document.getElementById("playlists");
-  if (!playlist) {
+  const playlistContainer = document.getElementById("playlists");
+  if (!playlistContainer) {
     throw new Error("Element not found");
   }
-  playlist.innerHTML = playlists.items
-    .map((playlist) => {
-      return `<li>${playlist.name}</li>`;
+  playlistContainer.innerHTML = playlists.items
+    .map((playlist, index) => {
+      return `<li><input type="radio" name="playlist" id="playlist${index}" value="${playlist.uri}">
+    <label for="playlist${index}">${playlist.name}</label></li>`;
     })
     .join("");
+
+  document.querySelectorAll("input[name='playlist']").forEach((input) => {
+    input.addEventListener("change", (event) => {
+      const selected = event.target as HTMLInputElement;
+      if (selected) {
+        const selectedPlaylistUri = selected.value;
+        playTrack(selectedPlaylistUri);
+        togglePlay();
+        playlistsSection.style.display = "none";
+      }
+    });
+  });
+}
+// function playFirstTrackOfPlaylist(playlistUri: string) {
+//   getPlaylistTracks(playlistUri).then((tracks) => {
+//     if (tracks.items.length > 0) {
+//       const firstTrackUri = tracks.items[0].track.uri;
+//       playTrack(firstTrackUri);
+//       togglePlay();
+//     } else {
+//       alert("The selected playlist has no tracks.");
+//     }
+//   });
+// }
+
+function getPlaylistTracks(playlistUri: string): Promise<string[]> {
+  return fetch(
+    `https://api.spotify.com/v1/playlists/${playlistUri.split(":")[2]}/tracks`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")!}`,
+      },
+    }
+  ).then((response) => response.json());
 }
 
 function initActionsSection(): void {
@@ -123,6 +160,18 @@ function initActionsSection(): void {
     togglePlay();
   });
   renderActionsSection(true);
+  document.getElementById("nextButton")!.addEventListener("click", () => {
+    nextTrack();
+  });
+  document.getElementById("previousButton")!.addEventListener("click", () => {
+    previousTrack();
+  });
+  document.getElementById("shuffleButton")!.addEventListener("click", () => {
+    shuffleTrack();
+  });
+  document.getElementById("repeatButton")!.addEventListener("click", () => {
+    repeatTrack();
+  });
 }
 
 function renderActionsSection(render: boolean) {

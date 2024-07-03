@@ -27,6 +27,7 @@ type TokenResponse = {
 
 type Playlist = {
   name: string;
+  uri: string;
 };
 
 type PlaylistRequest = {
