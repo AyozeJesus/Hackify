@@ -7,6 +7,7 @@ import {
   togglePlay,
   getMyTopGenres,
   getCategories,
+  searchResults,
 } from "./api";
 
 const publicSection = document.getElementById("publicSection")!;
@@ -47,6 +48,7 @@ function initPrivateSection(profile?: UserProfile): void {
   initActionsSection();
   initMyTopGenresSection(profile);
   initBrowseAllSection();
+  initSearchSection(); // Agregado para inicializar la sección de búsqueda
 }
 
 function renderPrivateSection(isLogged: boolean) {
@@ -188,4 +190,58 @@ function renderCategories(categories: Category[]) {
       return `<li>${category.name} - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
     })
     .join("");
+}
+
+function initSearchSection() {
+  const searchInput = document.getElementById(
+    "searchInput"
+  ) as HTMLInputElement;
+  const searchButton = document.getElementById("searchButton");
+  const searchTypeSelect = document.getElementById(
+    "searchType"
+  ) as HTMLSelectElement;
+
+  if (!searchButton || !searchInput || !searchTypeSelect) {
+    throw new Error("Search elements not found");
+  }
+
+  searchButton.addEventListener("click", async () => {
+    const query = searchInput.value.trim();
+    const type = searchTypeSelect.value;
+    if (query && type) {
+      const accessToken = localStorage.getItem("accessToken");
+      const searchResultsElement = document.getElementById("searchResults");
+
+      if (searchResultsElement) {
+        searchResultsElement.innerHTML = "";
+      }
+
+      try {
+        const results = await searchResults(accessToken!, query, type);
+        renderSearchResults(results);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        renderSearchResults([]);
+      }
+    }
+  });
+
+  searchTypeSelect.addEventListener("change", () => {
+    const searchResultsElement = document.getElementById("searchResults");
+    if (searchResultsElement) {
+      searchResultsElement.innerHTML = "";
+    }
+  });
+}
+
+function renderSearchResults(results: string[]) {
+  const searchResultsElement = document.getElementById("searchResults");
+  if (!searchResultsElement) {
+    throw new Error("Search results element not found");
+  }
+
+  searchResultsElement.innerHTML = "";
+
+  const items = results.map((result) => `<li>${result}</li>`).join("");
+  searchResultsElement.innerHTML = items;
 }

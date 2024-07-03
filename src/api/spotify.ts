@@ -97,3 +97,35 @@ export async function getMyTopGenres(accessToken: string): Promise<string[]> {
 
   return data.items[0].genres;
 }
+
+export async function searchResults(
+  token: string,
+  query: string,
+  type: string
+): Promise<string[]> {
+  try {
+    const response = await fetch(
+      `${api}/v1/search?q=${encodeURIComponent(query)}&type=${type}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    const results: string[] = data[type + "s"].items.map(
+      (item: any) => item.name
+    );
+
+    return results;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
