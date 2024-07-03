@@ -12,7 +12,10 @@ export async function redirectToProvider(): Promise<void> {
   params.append("client_id", import.meta.env.VITE_CLIENTID);
   params.append("response_type", "code");
   params.append("redirect_uri", import.meta.env.VITE_URI_CALLBACK);
-  params.append("scope", "user-read-private user-read-email");
+  params.append(
+    "scope",
+    "user-read-private user-read-email user-top-read user-library-read"
+  );
   params.append("code_challenge_method", "S256");
   params.append("code_challenge", challenge);
 
@@ -117,7 +120,6 @@ export async function getCategories(token: string): Promise<Category[]> {
   }
 
   const data: CategoryResponse = await response.json();
-  console.log(data);
   return data.categories.items;
 }
 
@@ -133,7 +135,6 @@ export async function getMyTopGenres(accessToken: string): Promise<string[]> {
   }
 
   const data: TopGenresResponse = await response.json();
-  console.log(data);
 
   return data.items[0].genres;
 }
@@ -157,7 +158,6 @@ export async function searchResults(
     }
 
     const data = await response.json();
-    console.log(data);
 
     const results: string[] = data[type + "s"].items.map(
       (item: any) => item.name
@@ -166,6 +166,38 @@ export async function searchResults(
     return results;
   } catch (error) {
     console.error("Error fetching data:", error);
+    throw error;
+  }
+}
+
+export async function getSavedTracks(token: string): Promise<string[]> {
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/me/tracks`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Error response from Spotify API:", errorResponse);
+      throw new Error(
+        `Failed to fetch saved tracks: ${errorResponse.error.message}`
+      );
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error("Invalid response format from Spotify API");
+    }
+
+    return data.items;
+  } catch (error) {
+    console.error("Error fetching saved tracks:", error);
     throw error;
   }
 }

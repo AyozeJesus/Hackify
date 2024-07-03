@@ -19,7 +19,7 @@
         <button id="playlistsButton">Mis playlists</button>
         <button id="logoutButton">Logout</button>
       </section>
-      <section id="profileSection">
+      <section id="profileSection" style="display: none">
         <h1>Display your Spotify profile data</h1>
         <h2>Logged in as <span id="displayName"></span></h2>
         <ul>
@@ -29,7 +29,7 @@
           <li>Link: <a id="url" href="#"></a></li>
         </ul>
       </section>
-      <section id="playlistsSection">
+      <section id="playlistsSection" style="display: none">
         <p>Mis playlists:</p>
         <ul id="playlists"></ul>
       </section>
@@ -50,12 +50,20 @@
         <h1>Browse All</h1>
         <ul id="browseAll"></ul>
       </section>
+      <section id="savedTracksSection" style="display: none">
+        <h1>Saved Tracks</h1>
+        <ul id="savedTracks"></ul>
+      </section>
       <section id="spotifyEmbedSection">
         <div id="embed-iframe"></div>
         <section id="searchSection">
           <h2>Search</h2>
           <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search for music..." />
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search for music..."
+            />
             <select id="searchType">
               <option value="track">Track</option>
               <option value="album">Album</option>
@@ -69,5 +77,7 @@
           </div>
           <ul id="searchResults"></ul>
         </section>
-          </body>
-        </html>
+      </section>
+    </section>
+  </body>
+</html>
