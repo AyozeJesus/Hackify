@@ -196,17 +196,6 @@ function renderPlaylists(playlists: PlaylistRequest) {
     });
   });
 }
-// function playFirstTrackOfPlaylist(playlistUri: string) {
-//   getPlaylistTracks(playlistUri).then((tracks) => {
-//     if (tracks.items.length > 0) {
-//       const firstTrackUri = tracks.items[0].track.uri;
-//       playTrack(firstTrackUri);
-//       togglePlay();
-//     } else {
-//       alert("The selected playlist has no tracks.");
-//     }
-//   });
-// }
 
 function getPlaylistTracks(playlistUri: string): Promise<string[]> {
   return fetch(
@@ -387,6 +376,8 @@ function renderSavedTracks(savedTracks: any[]) {
     throw new Error("Element not found: savedTracks");
   }
 
+  savedTracksElement.innerHTML = "";
+
   const tracksHTML = savedTracks
     .map((item, index) => {
       const trackName = item.track.name;
@@ -395,21 +386,36 @@ function renderSavedTracks(savedTracks: any[]) {
         .join(", ");
       const albumName = item.track.album.name;
       const albumImage = item.track.album.images[0].url;
+      const trackUri = item.track.uri;
 
       return `
-      <li>
-        <img src="${albumImage}" alt="Imagen de ${trackName}" width="100">
-        <div>
-          <h3>${trackName}</h3>
-          <p>Artista(s): ${artists}</p>
-          <p>Álbum: ${albumName}</p>
-        </div>
-      </li>
-    `;
+        <li data-track-uri="${trackUri}">
+          <img src="${albumImage}" alt="Imagen de ${trackName}" width="100">
+          <div>
+            <h3>${trackName}</h3>
+            <p>Artista(s): ${artists}</p>
+            <p>Álbum: ${albumName}</p>
+          </div>
+        </li>
+      `;
     })
     .join("");
 
   savedTracksElement.innerHTML = tracksHTML;
+
+  // Agregar el event listener para manejar clics en los tracks guardados
+  savedTracksElement.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    if (target.tagName === "LI") {
+      const trackUri = target.getAttribute("data-track-uri");
+      if (trackUri) {
+        console.log(`Clicked on track with URI ${trackUri}`); // Log de depuración
+        playTrack(trackUri);
+        togglePlay();
+        console.log("deberia reproducir la cancion");
+      }
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
