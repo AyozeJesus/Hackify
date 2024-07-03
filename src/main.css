@@ -4,13 +4,15 @@
 }
 
 /* hack, intencionalmente oculto, con display none no funciona */
-/* iframe {
-	top: 0;
-	width: 0;
-	height: 0;
-	position: absolute;
-	overflow: hidden;
-} */
+
+iframe {
+  top: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+  overflow: hidden;
+}
+
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
