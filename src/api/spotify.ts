@@ -65,14 +65,6 @@ export async function getMyPlaylists(token: string): Promise<PlaylistRequest> {
 
 // TODO agregar nuevas funciones para obtener playlists, canciones, etc
 
-export async function getPlaybackState(token: string): Promise<PlaybackState> {
-  const response = await fetch(`${api}/v1/me/player`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return await response.json();
-}
-
 export async function getPlayer(token: string) {
   const response = await fetch(`${api}/v1/me/player`, {
     method: "GET",
@@ -110,4 +102,70 @@ export async function repeatTrack(token: string) {
     headers: { Authorization: `Bearer ${token}` },
   });
   return await response.json();
+}
+
+export async function getCategories(token: string): Promise<Category[]> {
+  const response = await fetch(`${api}/v1/browse/categories`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+
+  const data: CategoryResponse = await response.json();
+  console.log(data);
+  return data.categories.items;
+}
+
+export async function getMyTopGenres(accessToken: string): Promise<string[]> {
+  const response = await fetch(`${api}/v1/me/top/artists`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch top genres");
+  }
+
+  const data: TopGenresResponse = await response.json();
+  console.log(data);
+
+  return data.items[0].genres;
+}
+
+export async function searchResults(
+  token: string,
+  query: string,
+  type: string
+): Promise<string[]> {
+  try {
+    const response = await fetch(
+      `${api}/v1/search?q=${encodeURIComponent(query)}&type=${type}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    const results: string[] = data[type + "s"].items.map(
+      (item: any) => item.name
+    );
+
+    return results;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
 }

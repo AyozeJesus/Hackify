@@ -2,23 +2,21 @@ import "./main.css";
 import { init as authenticatorInit, login, logout } from "./auth";
 import {
   getMyPlaylists,
-  getPlaybackState,
   initPlayer,
   playTrack,
   togglePlay,
-  nextTrack,
-  previousTrack,
-  shuffleTrack,
-  repeatTrack,
+  getMyTopGenres,
+  getCategories,
+  searchResults,
 } from "./api";
-
-import { PlaybackState, UserProfile, PlaylistRequest } from "./utils/types";
 
 const publicSection = document.getElementById("publicSection")!;
 const privateSection = document.getElementById("privateSection")!;
 const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const actionsSection = document.getElementById("actionsSection")!;
+const topGenresSection = document.getElementById("topGenresSection")!;
+const browseAllSection = document.getElementById("browseAllSection")!;
 
 let selectedPlaylistUri: string | null = null;
 
@@ -50,6 +48,9 @@ function initPrivateSection(profile?: UserProfile): void {
   initProfileSection(profile);
   initPlaylistSection(profile);
   initActionsSection();
+  initMyTopGenresSection(profile);
+  initBrowseAllSection();
+  initSearchSection();
 }
 
 function renderPrivateSection(isLogged: boolean) {
@@ -140,7 +141,7 @@ function renderPlaylists(playlists: PlaylistRequest) {
 //   });
 // }
 
-function getPlaylistTracks(playlistUri: string): Promise<TracksResponse> {
+function getPlaylistTracks(playlistUri: string): Promise<string[]> {
   return fetch(
     `https://api.spotify.com/v1/playlists/${playlistUri.split(":")[2]}/tracks`,
     {
@@ -178,3 +179,118 @@ function renderActionsSection(render: boolean) {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+function initMyTopGenresSection(profile?: UserProfile): void {
+  if (profile) {
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("Access token:", accessToken);
+    getMyTopGenres(accessToken!)
+      .then((topGenres: UserTopGenres) => {
+        console.log("Top genres:", topGenres);
+        renderMyTopGenresSection(true);
+        renderMyTopGenres(topGenres);
+      })
+      .catch((error) => {
+        console.error("Error fetching top genres:", error);
+      });
+  }
+}
+
+function renderMyTopGenresSection(render: boolean) {
+  topGenresSection.style.display = render ? "block" : "none";
+}
+
+function renderMyTopGenres(topGenres: UserTopGenres) {
+  const genresElement = document.getElementById("genres");
+  if (!genresElement) {
+    throw new Error("Element not found");
+  }
+  genresElement.innerHTML = topGenres
+    .map((genre) => `<li>${genre}</li>`)
+    .join("");
+}
+
+async function initBrowseAllSection() {
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    const categories = await getCategories(accessToken!);
+    renderBrowseAllSection(true);
+    renderCategories(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+  }
+}
+
+function renderBrowseAllSection(render: boolean) {
+  const browseAllSection = document.getElementById("browseAllSection");
+  if (!browseAllSection) {
+    throw new Error("Element not found");
+  }
+  browseAllSection.style.display = render ? "block" : "none";
+}
+
+function renderCategories(categories: Category[]) {
+  const browseAllElement = document.getElementById("browseAll");
+  if (!browseAllElement) {
+    throw new Error("Element not found");
+  }
+  browseAllElement.innerHTML = categories
+    .map((category) => {
+      return `<li>${category.name} - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
+    })
+    .join("");
+}
+
+function initSearchSection() {
+  const searchInput = document.getElementById(
+    "searchInput"
+  ) as HTMLInputElement;
+  const searchButton = document.getElementById("searchButton");
+  const searchTypeSelect = document.getElementById(
+    "searchType"
+  ) as HTMLSelectElement;
+
+  if (!searchButton || !searchInput || !searchTypeSelect) {
+    throw new Error("Search elements not found");
+  }
+
+  searchButton.addEventListener("click", async () => {
+    const query = searchInput.value.trim();
+    const type = searchTypeSelect.value;
+    if (query && type) {
+      const accessToken = localStorage.getItem("accessToken");
+      const searchResultsElement = document.getElementById("searchResults");
+
+      if (searchResultsElement) {
+        searchResultsElement.innerHTML = "";
+      }
+
+      try {
+        const results = await searchResults(accessToken!, query, type);
+        renderSearchResults(results);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        renderSearchResults([]);
+      }
+    }
+  });
+
+  searchTypeSelect.addEventListener("change", () => {
+    const searchResultsElement = document.getElementById("searchResults");
+    if (searchResultsElement) {
+      searchResultsElement.innerHTML = "";
+    }
+  });
+}
+
+function renderSearchResults(results: string[]) {
+  const searchResultsElement = document.getElementById("searchResults");
+  if (!searchResultsElement) {
+    throw new Error("Search results element not found");
+  }
+
+  searchResultsElement.innerHTML = "";
+
+  const items = results.map((result) => `<li>${result}</li>`).join("");
+  searchResultsElement.innerHTML = items;
+}

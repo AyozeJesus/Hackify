@@ -8,11 +8,11 @@
   </head>
   <body>
     <section id="publicSection">
-      Sector publico: <br />
+      Public Section: <br />
       <button id="loginButton">Login</button>
     </section>
     <section id="privateSection">
-      Sector privado: <br />
+      Private Section: <br />
       <section id="menuSection">
         <button id="profileButton">Profile</button>
         <button id="favoriteButton">Mis favoritos</button>
@@ -42,9 +42,32 @@
         <button id="repeatButton">Repeat</button>
         <button id="shuffleButton">Shuffle</button>
       </section>
+      <section id="topGenresSection" style="display: none">
+        <h1>Top Genres</h1>
+        <ul id="genres"></ul>
+      </section>
+      <section id="browseAllSection" style="display: none">
+        <h1>Browse All</h1>
+        <ul id="browseAll"></ul>
+      </section>
       <section id="spotifyEmbedSection">
         <div id="embed-iframe"></div>
-      </section>
-    </section>
-  </body>
-</html>
+        <section id="searchSection">
+          <h2>Search</h2>
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for music..." />
+            <select id="searchType">
+              <option value="track">Track</option>
+              <option value="album">Album</option>
+              <option value="artist">Artist</option>
+              <option value="playlist">Playlist</option>
+              <option value="show">Show</option>
+              <option value="episode">Episode</option>
+              <option value="audiobook">Audiobook</option>
+            </select>
+            <button id="searchButton">Search</button>
+          </div>
+          <ul id="searchResults"></ul>
+        </section>
+          </body>
+        </html>
