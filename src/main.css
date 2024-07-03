@@ -28,6 +28,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#categoryPlaylistsSection {
+  display: none;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

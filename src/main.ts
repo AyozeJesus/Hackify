@@ -9,6 +9,7 @@ import {
   getCategories,
   searchResults,
   getSavedTracks,
+  getCategoryPlaylists,
 } from "./api";
 
 const publicSection = document.getElementById("publicSection")!;
@@ -292,13 +293,86 @@ function renderCategories(categories: Category[]) {
   if (!browseAllElement) {
     throw new Error("Element not found");
   }
+
+  const accessToken = localStorage.getItem("accessToken");
+  if (!accessToken) {
+    throw new Error("Access token not found");
+  }
+
   browseAllElement.innerHTML = categories
     .map((category) => {
-      return `<li><a href="${category.href}">${category.name}</a> - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
+      return `<li><a href="#" class="category-link" data-category-id="${category.id}">${category.name}</a> - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
     })
     .join("");
+
+  // Añadir event listeners a los enlaces de categorías
+  const categoryLinks = document.querySelectorAll(".category-link");
+  categoryLinks.forEach((link) => {
+    link.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const categoryId = (event.target as HTMLElement).getAttribute(
+        "data-category-id"
+      );
+      if (categoryId) {
+        await showCategoryPlaylists(categoryId);
+      }
+    });
+  });
 }
 
+async function showCategoryPlaylists(categoryId: string): Promise<void> {
+  renderPublicSection(false);
+  renderPrivateSection(true);
+
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  actionsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+  categoryPlaylistsSection.style.display = "block";
+
+  try {
+    const token = localStorage.getItem("accessToken")!;
+    const playlists = await getCategoryPlaylists(token, categoryId);
+    renderCategoryPlaylists(playlists);
+  } catch (error) {
+    console.error("Error fetching category playlists: ", error);
+  }
+}
+
+function renderCategoryPlaylists(playlists: Playlist[]) {
+  const playlistsSection = document.getElementById("playlistsSection");
+  if (!playlistsSection) {
+    throw new Error("Element not found");
+  }
+
+  playlistsSection.innerHTML = playlists
+    .map((playlist, index) => {
+      return `<li><input type="radio" name="playlist" id="playlist${index}" value="${playlist.uri}">
+    <label for="playlist${index}">${playlist.name}</label></li>`;
+    })
+    .join("");
+
+  document.querySelectorAll("input[name='playlist']").forEach((input) => {
+    input.addEventListener("change", (event) => {
+      const selected = event.target as HTMLInputElement;
+      if (selected) {
+        const selectedPlaylistUri = selected.value;
+        playTrack(selectedPlaylistUri);
+        togglePlay();
+        renderPlaylistsSection(false);
+      }
+    });
+  });
+
+  renderCategoryPlaylistsSection(true);
+}
+
+function renderCategoryPlaylistsSection(render: boolean) {
+  playlistsSection.style.display = render ? "block" : "none";
+}
 function initSearchSection() {
   const searchInput = document.getElementById(
     "searchInput"

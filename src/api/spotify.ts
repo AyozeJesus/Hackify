@@ -120,7 +120,33 @@ export async function getCategories(token: string): Promise<Category[]> {
   }
 
   const data: CategoryResponse = await response.json();
+  console.log(data);
+
   return data.categories.items;
+}
+
+export async function getCategoryPlaylists(
+  token: string,
+  categoryId: string
+): Promise<Playlist[]> {
+  const response = await fetch(
+    `${api}/v1/browse/categories/${categoryId}/playlists`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch playlists");
+  }
+
+  const data: PlaylistResponse = await response.json();
+  console.log(data);
+
+  return data.playlists.items;
 }
 
 export async function getMyTopGenres(accessToken: string): Promise<string[]> {
