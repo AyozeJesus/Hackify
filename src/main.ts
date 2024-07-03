@@ -8,6 +8,7 @@ import {
   getMyTopGenres,
   getCategories,
   searchResults,
+  getSavedTracks,
 } from "./api";
 
 const publicSection = document.getElementById("publicSection")!;
@@ -16,9 +17,9 @@ const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const actionsSection = document.getElementById("actionsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
-const browseAllSection = document.getElementById("browseAllSection")!;
 
 let selectedPlaylistUri: string | null = null;
+let savedTracks: any[] = [];
 
 async function init() {
   let profile: UserProfile | undefined;
@@ -45,12 +46,75 @@ function renderPublicSection(render: boolean): void {
 function initPrivateSection(profile?: UserProfile): void {
   renderPrivateSection(!!profile);
   initMenuSection();
-  initProfileSection(profile);
-  initPlaylistSection(profile);
   initActionsSection();
   initMyTopGenresSection(profile);
   initBrowseAllSection();
   initSearchSection();
+
+  document.getElementById("profileButton")!.addEventListener("click", () => {
+    showProfile(profile);
+  });
+
+  document.getElementById("favoriteButton")!.addEventListener("click", () => {
+    showFavoriteTracks(profile);
+  });
+
+  document.getElementById("playlistsButton")!.addEventListener("click", () => {
+    showPlaylists(profile);
+  });
+}
+
+function showProfile(profile?: UserProfile): void {
+  renderPublicSection(false);
+  renderPrivateSection(true);
+
+  profileSection.style.display = "block";
+  playlistsSection.style.display = "none";
+  actionsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  if (profile) {
+    renderProfileSection(true);
+    renderProfileData(profile);
+  } else {
+    renderProfileSection(false);
+  }
+}
+
+function showPlaylists(profile?: UserProfile): void {
+  renderPublicSection(false);
+  renderPrivateSection(true);
+
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "block";
+  actionsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  if (profile) {
+    initPlaylistSection(profile);
+  }
+}
+
+function showFavoriteTracks(profile?: UserProfile): void {
+  renderPublicSection(false);
+  renderPrivateSection(true);
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  actionsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "block";
+
+  if (profile) {
+    initSavedTracksSection(profile);
+  }
 }
 
 function renderPrivateSection(isLogged: boolean) {
@@ -58,9 +122,6 @@ function renderPrivateSection(isLogged: boolean) {
 }
 
 function initMenuSection(): void {
-  document.getElementById("profileButton")!.addEventListener("click", () => {
-    renderProfileSection(profileSection.style.display !== "none");
-  });
   document.getElementById("playlistsButton")!.addEventListener("click", () => {
     renderPlaylistsSection(playlistsSection.style.display !== "none");
   });
@@ -68,26 +129,32 @@ function initMenuSection(): void {
 }
 
 function initProfileSection(profile?: UserProfile | undefined) {
-  renderProfileSection(!!profile);
+  renderProfileSection(false);
   if (profile) {
     renderProfileData(profile);
   }
 }
 
 function renderProfileSection(render: boolean) {
-  profileSection.style.display = render ? "none" : "block";
+  profileSection.style.display = render ? "block" : "none";
 }
 
 function renderProfileData(profile: UserProfile) {
-  document.getElementById("displayName")!.innerText = profile.display_name;
-  document.getElementById("id")!.innerText = profile.id;
-  document.getElementById("email")!.innerText = profile.email;
-  document.getElementById("uri")!.innerText = profile.uri;
-  document
-    .getElementById("uri")!
-    .setAttribute("href", profile.external_urls.spotify);
-  document.getElementById("url")!.innerText = profile.href;
-  document.getElementById("url")!.setAttribute("href", profile.href);
+  if (profile) {
+    document.getElementById("displayName")!.innerText =
+      profile.display_name || "";
+    document.getElementById("id")!.innerText = profile.id || "";
+    document.getElementById("email")!.innerText = profile.email || "";
+    document.getElementById("uri")!.innerText = profile.uri || "";
+    document
+      .getElementById("uri")!
+      .setAttribute("href", profile.external_urls.spotify || "");
+    document.getElementById("url")!.innerText = profile.href || "";
+    document.getElementById("url")!.setAttribute("href", profile.href || "");
+    profileSection.style.display = "block";
+  } else {
+    profileSection.style.display = "none";
+  }
 }
 
 function initPlaylistSection(profile?: UserProfile): void {
@@ -102,7 +169,7 @@ function initPlaylistSection(profile?: UserProfile): void {
 }
 
 function renderPlaylistsSection(render: boolean) {
-  playlistsSection.style.display = render ? "none" : "block";
+  playlistsSection.style.display = render ? "block" : "none";
 }
 
 function renderPlaylists(playlists: PlaylistRequest) {
@@ -124,7 +191,7 @@ function renderPlaylists(playlists: PlaylistRequest) {
         const selectedPlaylistUri = selected.value;
         playTrack(selectedPlaylistUri);
         togglePlay();
-        playlistsSection.style.display = "none";
+        renderPlaylistsSection(false);
       }
     });
   });
@@ -177,8 +244,6 @@ function initActionsSection(): void {
 function renderActionsSection(render: boolean) {
   actionsSection.style.display = render ? "block" : "none";
 }
-
-document.addEventListener("DOMContentLoaded", init);
 
 function initMyTopGenresSection(profile?: UserProfile): void {
   if (profile) {
@@ -294,3 +359,57 @@ function renderSearchResults(results: string[]) {
   const items = results.map((result) => `<li>${result}</li>`).join("");
   searchResultsElement.innerHTML = items;
 }
+
+async function initSavedTracksSection(profile?: UserProfile): Promise<void> {
+  try {
+    if (profile) {
+      const accessToken = localStorage.getItem("accessToken");
+      const savedTracks = await getSavedTracks(accessToken!);
+      renderSavedTracksSection(true);
+      renderSavedTracks(savedTracks);
+    }
+  } catch (error) {
+    console.error("Error fetching saved tracks:", error);
+  }
+}
+
+function renderSavedTracksSection(render: boolean) {
+  const savedTracksSection = document.getElementById("savedTracksSection");
+  if (!savedTracksSection) {
+    throw new Error("Element not found: savedTracksSection");
+  }
+  savedTracksSection.style.display = render ? "block" : "none";
+}
+
+function renderSavedTracks(savedTracks: any[]) {
+  const savedTracksElement = document.getElementById("savedTracks");
+  if (!savedTracksElement) {
+    throw new Error("Element not found: savedTracks");
+  }
+
+  const tracksHTML = savedTracks
+    .map((item, index) => {
+      const trackName = item.track.name;
+      const artists = item.track.artists
+        .map((artist: any) => artist.name)
+        .join(", ");
+      const albumName = item.track.album.name;
+      const albumImage = item.track.album.images[0].url;
+
+      return `
+      <li>
+        <img src="${albumImage}" alt="Imagen de ${trackName}" width="100">
+        <div>
+          <h3>${trackName}</h3>
+          <p>Artista(s): ${artists}</p>
+          <p>Álbum: ${albumName}</p>
+        </div>
+      </li>
+    `;
+    })
+    .join("");
+
+  savedTracksElement.innerHTML = tracksHTML;
+}
+
+document.addEventListener("DOMContentLoaded", init);
