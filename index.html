@@ -8,10 +8,10 @@
   </head>
   <body>
     <section id="publicSection">
-      Sector público: <br />
+      Sector publico: <br />
       <button id="loginButton">Login</button>
     </section>
-    <section id="privateSection" style="display: none">
+    <section id="privateSection">
       Sector privado: <br />
       <section id="menuSection">
         <button id="profileButton">Profile</button>
@@ -19,7 +19,7 @@
         <button id="playlistsButton">Mis playlists</button>
         <button id="logoutButton">Logout</button>
       </section>
-      <section id="profileSection" style="display: none">
+      <section id="profileSection">
         <h1>Display your Spotify profile data</h1>
         <h2>Logged in as <span id="displayName"></span></h2>
         <ul>
@@ -29,26 +29,21 @@
           <li>Link: <a id="url" href="#"></a></li>
         </ul>
       </section>
-      <section id="playlistsSection" style="display: none">
+      <section id="playlistsSection">
         <p>Mis playlists:</p>
         <ul id="playlists"></ul>
-        <button id="playSelectedButton">Play selected playlist</button>
       </section>
-      <section id="actionsSection" style="display: none">
+      <section id="actionsSection">
         <p>Acciones comunes:</p>
         <button id="changeButton">Cambiar track</button>
+        <button id="previousButton">Previous</button>
         <button id="playButton">Play/Pause</button>
+        <button id="nextButton">Next</button>
+        <button id="repeatButton">Repeat</button>
+        <button id="shuffleButton">Shuffle</button>
       </section>
-      <section id="spotifyEmbedSection" style="display: none">
+      <section id="spotifyEmbedSection">
         <div id="embed-iframe"></div>
-      </section>
-      <section id="topGenresSection" style="display: none">
-        <h2>Your top genres</h2>
-        <ul id="genres"></ul>
-      </section>
-      <section id="browseAllSection" style="display: none">
-        <h2>Browse all</h2>
-        <ul id="browseAll"></ul>
       </section>
     </section>
   </body>

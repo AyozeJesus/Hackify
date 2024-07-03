@@ -1,5 +1,4 @@
 import { generateCodeChallenge, generateCodeVerifier } from "../utils";
-
 const apiAccount = "https://accounts.spotify.com";
 const api = "https://api.spotify.com";
 
@@ -13,7 +12,7 @@ export async function redirectToProvider(): Promise<void> {
   params.append("client_id", import.meta.env.VITE_CLIENTID);
   params.append("response_type", "code");
   params.append("redirect_uri", import.meta.env.VITE_URI_CALLBACK);
-  params.append("scope", "user-read-private user-read-email user-top-read");
+  params.append("scope", "user-read-private user-read-email");
   params.append("code_challenge_method", "S256");
   params.append("code_challenge", challenge);
 
@@ -64,36 +63,51 @@ export async function getMyPlaylists(token: string): Promise<PlaylistRequest> {
   return await result.json();
 }
 
-export async function getCategories(token: string): Promise<Category[]> {
-  const response = await fetch(`${api}/v1/browse/categories`, {
+// TODO agregar nuevas funciones para obtener playlists, canciones, etc
+
+export async function getPlaybackState(token: string): Promise<PlaybackState> {
+  const response = await fetch(`${api}/v1/me/player`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch categories");
-  }
-
-  const data: CategoryResponse = await response.json();
-  console.log(data);
-  return data.categories.items;
+  return await response.json();
 }
 
-export async function getMyTopGenres(accessToken: string): Promise<string[]> {
-  const response = await fetch(`${api}/v1/me/top/artists`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+export async function getPlayer(token: string) {
+  const response = await fetch(`${api}/v1/me/player`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
   });
+  return await response.json();
+}
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch top genres");
-  }
+export async function nextTrack(token: string) {
+  const response = await fetch(`${api}/v1/me/player/next`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await response.json();
+}
 
-  const data: TopGenresResponse = await response.json();
-  console.log(data);
+export async function previousTrack(token: string) {
+  const response = await fetch(`${api}/v1/me/player/previous`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await response.json();
+}
+export async function shuffleTrack(token: string) {
+  const response = await fetch(`${api}/v1/me/player/shuffle`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await response.json();
+}
 
-  return data.items[0].genres;
+export async function repeatTrack(token: string) {
+  const response = await fetch(`${api}/v1/me/player/repeat`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await response.json();
 }

@@ -2,20 +2,25 @@ import "./main.css";
 import { init as authenticatorInit, login, logout } from "./auth";
 import {
   getMyPlaylists,
+  getPlaybackState,
   initPlayer,
   playTrack,
   togglePlay,
-  getMyTopGenres,
-  getCategories,
+  nextTrack,
+  previousTrack,
+  shuffleTrack,
+  repeatTrack,
 } from "./api";
+
+import { PlaybackState, UserProfile, PlaylistRequest } from "./utils/types";
 
 const publicSection = document.getElementById("publicSection")!;
 const privateSection = document.getElementById("privateSection")!;
 const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const actionsSection = document.getElementById("actionsSection")!;
-const topGenresSection = document.getElementById("topGenresSection")!;
-const browseAllSection = document.getElementById("browseAllSection")!;
+
+let selectedPlaylistUri: string | null = null;
 
 async function init() {
   let profile: UserProfile | undefined;
@@ -45,8 +50,6 @@ function initPrivateSection(profile?: UserProfile): void {
   initProfileSection(profile);
   initPlaylistSection(profile);
   initActionsSection();
-  initMyTopGenresSection(profile);
-  initBrowseAllSection();
 }
 
 function renderPrivateSection(isLogged: boolean) {
@@ -102,15 +105,50 @@ function renderPlaylistsSection(render: boolean) {
 }
 
 function renderPlaylists(playlists: PlaylistRequest) {
-  const playlist = document.getElementById("playlists");
-  if (!playlist) {
+  const playlistContainer = document.getElementById("playlists");
+  if (!playlistContainer) {
     throw new Error("Element not found");
   }
-  playlist.innerHTML = playlists.items
-    .map((playlist) => {
-      return `<li>${playlist.name}</li>`;
+  playlistContainer.innerHTML = playlists.items
+    .map((playlist, index) => {
+      return `<li><input type="radio" name="playlist" id="playlist${index}" value="${playlist.uri}">
+    <label for="playlist${index}">${playlist.name}</label></li>`;
     })
     .join("");
+
+  document.querySelectorAll("input[name='playlist']").forEach((input) => {
+    input.addEventListener("change", (event) => {
+      const selected = event.target as HTMLInputElement;
+      if (selected) {
+        const selectedPlaylistUri = selected.value;
+        playTrack(selectedPlaylistUri);
+        togglePlay();
+        playlistsSection.style.display = "none";
+      }
+    });
+  });
+}
+// function playFirstTrackOfPlaylist(playlistUri: string) {
+//   getPlaylistTracks(playlistUri).then((tracks) => {
+//     if (tracks.items.length > 0) {
+//       const firstTrackUri = tracks.items[0].track.uri;
+//       playTrack(firstTrackUri);
+//       togglePlay();
+//     } else {
+//       alert("The selected playlist has no tracks.");
+//     }
+//   });
+// }
+
+function getPlaylistTracks(playlistUri: string): Promise<TracksResponse> {
+  return fetch(
+    `https://api.spotify.com/v1/playlists/${playlistUri.split(":")[2]}/tracks`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")!}`,
+      },
+    }
+  ).then((response) => response.json());
 }
 
 function initActionsSection(): void {
@@ -121,6 +159,18 @@ function initActionsSection(): void {
     togglePlay();
   });
   renderActionsSection(true);
+  document.getElementById("nextButton")!.addEventListener("click", () => {
+    nextTrack();
+  });
+  document.getElementById("previousButton")!.addEventListener("click", () => {
+    previousTrack();
+  });
+  document.getElementById("shuffleButton")!.addEventListener("click", () => {
+    shuffleTrack();
+  });
+  document.getElementById("repeatButton")!.addEventListener("click", () => {
+    repeatTrack();
+  });
 }
 
 function renderActionsSection(render: boolean) {
@@ -128,64 +178,3 @@ function renderActionsSection(render: boolean) {
 }
 
 document.addEventListener("DOMContentLoaded", init);
-
-function initMyTopGenresSection(profile?: UserProfile): void {
-  if (profile) {
-    const accessToken = localStorage.getItem("accessToken");
-    console.log("Access token:", accessToken);
-    getMyTopGenres(accessToken!)
-      .then((topGenres: UserTopGenres) => {
-        console.log("Top genres:", topGenres);
-        renderMyTopGenresSection(true);
-        renderMyTopGenres(topGenres);
-      })
-      .catch((error) => {
-        console.error("Error fetching top genres:", error);
-      });
-  }
-}
-
-function renderMyTopGenresSection(render: boolean) {
-  topGenresSection.style.display = render ? "block" : "none";
-}
-
-function renderMyTopGenres(topGenres: UserTopGenres) {
-  const genresElement = document.getElementById("genres");
-  if (!genresElement) {
-    throw new Error("Element not found");
-  }
-  genresElement.innerHTML = topGenres
-    .map((genre) => `<li>${genre}</li>`)
-    .join("");
-}
-
-async function initBrowseAllSection() {
-  try {
-    const accessToken = localStorage.getItem("accessToken");
-    const categories = await getCategories(accessToken!);
-    renderBrowseAllSection(true);
-    renderCategories(categories);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-  }
-}
-
-function renderBrowseAllSection(render: boolean) {
-  const browseAllSection = document.getElementById("browseAllSection");
-  if (!browseAllSection) {
-    throw new Error("Element not found");
-  }
-  browseAllSection.style.display = render ? "block" : "none";
-}
-
-function renderCategories(categories: Category[]) {
-  const browseAllElement = document.getElementById("browseAll");
-  if (!browseAllElement) {
-    throw new Error("Element not found");
-  }
-  browseAllElement.innerHTML = categories
-    .map((category) => {
-      return `<li>${category.name} - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
-    })
-    .join("");
-}
