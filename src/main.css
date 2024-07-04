@@ -111,22 +111,20 @@ a {
 a:hover {
   color: #535bf2;
 }
-
-.user-profile img {
-  border-radius: 50%;
-  height: 40px;
-  width: 40px;
-  margin-right: 10px;
+.userProfile {
+  display: flex;
+  align-items: center;
 }
 
 .header {
+  height: 70px;
   background-color: #040e0d;
   flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 15px;
   box-sizing: border-box;
 }
 
@@ -255,6 +253,18 @@ button:focus-visible {
 
   .content {
     padding: 20px;
+  }
+
+  .userProfile {
+    display: none;
+  }
+
+  .header {
+    justify-content: center;
+  }
+
+  .search-container {
+    display: none;
   }
 }
 
