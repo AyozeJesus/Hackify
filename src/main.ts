@@ -370,6 +370,8 @@ function initSearchSection() {
       try {
         const results = await searchResults(accessToken!, query, type);
         renderSearchResults(results);
+        document.getElementById("browseAllSection")!.style.display = "none";
+        topGenresSection.style.display = "none";
       } catch (error) {
         console.error("Error fetching search results:", error);
         renderSearchResults([]);
@@ -391,10 +393,8 @@ function renderSearchResults(data: any[]) {
     throw new Error("Search results element not found");
   }
 
-  // Limpiamos el contenido previo
   searchResultsElement.innerHTML = "";
 
-  // Construimos la lista de resultados
   console.log("Rendering search results:", data);
   const items = data
     .map((item) => {
@@ -434,6 +434,9 @@ function renderSearchResults(data: any[]) {
         console.log(selected + "El Selected");
         console.log(items + "Es items");
         togglePlay();
+        searchResultsElement.innerHTML = "";
+        document.getElementById("browseAllSection")!.style.display = "none";
+        topGenresSection.style.display = "none";
       }
     });
   });

@@ -19,7 +19,7 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
+  min-height: 100vh;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -43,8 +43,8 @@
 .genres-container,
 .browse-container {
   width: 100%;
-  overflow-x: auto; 
-  white-space: nowrap; 
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .browse-container ul {
@@ -52,16 +52,16 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  margin: 0; 
+  margin: 0;
 }
 
 .browse-container ul li {
   margin: 0.5rem;
   text-align: center;
   flex: 0 0 auto;
-  width: calc(10% - 1rem); 
-  max-width: 200px; 
-  min-width: 100px; 
+  width: calc(10% - 1rem);
+  max-width: 200px;
+  min-width: 100px;
 }
 
 .browse-container ul li a {
@@ -83,14 +83,11 @@
 
 .browse-container ul li span {
   margin-top: 0.5rem;
-}argin-top: 0.5rem; /* Espacio superior para separar la imagen del texto */
 }
 
 main {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 .container {
   display: flex;
@@ -121,7 +118,6 @@ a:hover {
 
 .header {
   background-color: #040e0d;
-  height: 60px;
   flex-shrink: 0;
   width: 100%;
   display: flex;
@@ -137,7 +133,8 @@ body {
   flex-direction: column;
   place-items: flex-start;
   min-width: 320px;
-  min-height: 100vh;
+  height: 100%;
+  width: 100%;
 }
 
 h1 {
@@ -196,6 +193,7 @@ button:focus-visible {
 .aside {
   background-color: #121212;
   width: 280px;
+  min-height: 100vh;
   padding-top: 2px;
   flex-shrink: 0;
 }
@@ -241,5 +239,18 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+@media (max-width: 700px) {
+  .container {
+    flex-direction: column-reverse;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .content {
+    padding: 20px;
   }
 }
