@@ -5,6 +5,30 @@
   height: 100%;
 }
 
+.genre-card {
+  width: 200px;
+  height: 250px;
+  border: 1px solid #ccc;
+  margin: 10px;
+  padding: 10px;
+  cursor: pointer;
+  background-color: gray;
+}
+
+.genre-card h3 {
+  margin-bottom: 5px;
+}
+
+.genre-card img {
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+  object-fit: cover;
+}
+.large-category img {
+  width: 150px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -331,7 +355,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
-@media (max-width: 700px) {
+@media (max-width: 775px) {
   .container {
     flex-direction: column-reverse;
   }
@@ -356,7 +380,6 @@ button:focus-visible {
     display: none;
   }
 }
-
 
 savedTracks-container {
   width: 100%;
@@ -436,7 +459,7 @@ savedTracks-container {
   cursor: pointer;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 775px) {
   .floating-menu {
     display: flex;
   }
