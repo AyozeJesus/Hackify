@@ -16,7 +16,6 @@ const publicSection = document.getElementById("publicSection")!;
 const privateSection = document.getElementById("privateSection")!;
 const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
-const actionsSection = document.getElementById("actionsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
 
 let selectedPlaylistUri: string | null = null;
@@ -47,7 +46,6 @@ function renderPublicSection(render: boolean): void {
 function initPrivateSection(profile?: UserProfile): void {
   renderPrivateSection(!!profile);
   initMenuSection();
-  initActionsSection();
   initMyTopGenresSection(profile);
   initBrowseAllSection();
   initSearchSection();
@@ -70,12 +68,11 @@ function initPrivateSection(profile?: UserProfile): void {
 }
 
 function showProfile(profile?: UserProfile): void {
-  renderPublicSection(false);
+  renderPublicSection(!!profile);
   renderPrivateSection(true);
 
   profileSection.style.display = "block";
   playlistsSection.style.display = "none";
-  actionsSection.style.display = "none";
   topGenresSection.style.display = "none";
   document.getElementById("browseAllSection")!.style.display = "none";
   document.getElementById("searchSection")!.style.display = "none";
@@ -90,12 +87,11 @@ function showProfile(profile?: UserProfile): void {
 }
 
 function showPlaylists(profile?: UserProfile): void {
-  renderPublicSection(false);
+  renderPublicSection(!!profile);
   renderPrivateSection(true);
 
   profileSection.style.display = "none";
   playlistsSection.style.display = "block";
-  actionsSection.style.display = "none";
   topGenresSection.style.display = "none";
   document.getElementById("browseAllSection")!.style.display = "none";
   document.getElementById("searchSection")!.style.display = "none";
@@ -107,11 +103,10 @@ function showPlaylists(profile?: UserProfile): void {
 }
 
 function showFavoriteTracks(profile?: UserProfile): void {
-  renderPublicSection(false);
+  renderPublicSection(!!profile);
   renderPrivateSection(true);
   profileSection.style.display = "none";
   playlistsSection.style.display = "none";
-  actionsSection.style.display = "none";
   topGenresSection.style.display = "none";
   document.getElementById("browseAllSection")!.style.display = "none";
   document.getElementById("searchSection")!.style.display = "none";
@@ -213,32 +208,6 @@ function getPlaylistTracks(playlistUri: string): Promise<string[]> {
   ).then((response) => response.json());
 }
 
-function initActionsSection(): void {
-  document.getElementById("changeButton")!.addEventListener("click", () => {
-    playTrack("spotify:track:11dFghVXANMlKmJXsNCbNl"); // solo a modo de ejemplo
-  });
-  document.getElementById("playButton")!.addEventListener("click", () => {
-    togglePlay();
-  });
-  renderActionsSection(true);
-  document.getElementById("nextButton")!.addEventListener("click", () => {
-    nextTrack();
-  });
-  document.getElementById("previousButton")!.addEventListener("click", () => {
-    previousTrack();
-  });
-  document.getElementById("shuffleButton")!.addEventListener("click", () => {
-    shuffleTrack();
-  });
-  document.getElementById("repeatButton")!.addEventListener("click", () => {
-    repeatTrack();
-  });
-}
-
-function renderActionsSection(render: boolean) {
-  actionsSection.style.display = render ? "block" : "none";
-}
-
 function initMyTopGenresSection(profile?: UserProfile): void {
   if (profile) {
     const accessToken = localStorage.getItem("accessToken");
@@ -305,7 +274,6 @@ function renderCategories(categories: Category[]) {
     })
     .join("");
 
-  // Añadir event listeners a los enlaces de categorías
   const categoryLinks = document.querySelectorAll(".category-link");
   categoryLinks.forEach((link) => {
     link.addEventListener("click", async (event) => {
@@ -326,12 +294,10 @@ async function showCategoryPlaylists(categoryId: string): Promise<void> {
 
   profileSection.style.display = "none";
   playlistsSection.style.display = "none";
-  actionsSection.style.display = "none";
   topGenresSection.style.display = "none";
   document.getElementById("browseAllSection")!.style.display = "none";
   document.getElementById("searchSection")!.style.display = "none";
   document.getElementById("savedTracksSection")!.style.display = "none";
-  categoryPlaylistsSection.style.display = "block";
 
   try {
     const token = localStorage.getItem("accessToken")!;
