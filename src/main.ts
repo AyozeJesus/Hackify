@@ -270,7 +270,13 @@ function renderCategories(categories: Category[]) {
 
   browseAllElement.innerHTML = categories
     .map((category) => {
-      return `<li><a href="#" class="category-link" data-category-id="${category.id}">${category.name}</a> - <img src="${category.icons[0].url}" alt="${category.name}" width="100"></li>`;
+      return `
+        <li>
+          <a href="#" class="category-link" data-category-id="${category.id}">
+            <img src="${category.icons[0].url}" alt="${category.name}" width="100">
+            <span>${category.name}</span>
+          </a>
+        </li>`;
     })
     .join("");
 
@@ -278,9 +284,7 @@ function renderCategories(categories: Category[]) {
   categoryLinks.forEach((link) => {
     link.addEventListener("click", async (event) => {
       event.preventDefault();
-      const categoryId = (event.target as HTMLElement).getAttribute(
-        "data-category-id"
-      );
+      const categoryId = link.getAttribute("data-category-id");
       if (categoryId) {
         await showCategoryPlaylists(categoryId);
       }
