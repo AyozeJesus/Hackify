@@ -5,6 +5,64 @@
   height: 100%;
 }
 
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+  }
+  a:hover {
+    color: #747bff;
+  }
+}
+
+@media (max-width: 430px) {
+  .container {
+    flex-direction: column-reverse;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .genres-container ul li,
+  .browse-container ul li {
+    margin: 0.5rem;
+    width: calc(25% - 1rem);
+    min-width: 100px;
+  }
+
+  h1 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .user-profile img {
+    height: 30px;
+    width: 30px;
+  }
+
+  .header {
+    padding: 0 10px;
+  }
+
+  button {
+    padding: 0.5em 1em;
+    font-size: 14px;
+  }
+
+  .savedTracks-container ul li {
+    grid-template-columns: auto 30px 1fr 1fr 1fr;
+  }
+
+  .savedTracks-container ul li img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
 /* hack, intencionalmente oculto, con display none no funciona */
 
 /* iframe {
@@ -14,6 +72,37 @@
   position: absolute;
   overflow: hidden;
 } */
+
+.burger-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  min-height: 100vh;
+  background-color: #121212;
+  padding-top: 2px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  flex-shrink: 0;
+}
+
+.burger-menu ul {
+  list-style: none;
+  padding: 30px;
+}
+
+.burger-menu ul li {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  transition: background-color 0.3s;
+}
+
+.close-button {
+  background-color: #ff5722;
+  font-size: 1.5em;
+}
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -232,28 +321,6 @@ button:focus-visible {
   margin-left: auto;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-  }
-  a:hover {
-    color: #747bff;
-  }
-}
-@media (max-width: 700px) {
-  .container {
-    flex-direction: column-reverse;
-  }
-
-  .aside {
-    display: none;
-  }
-
-  .content {
-    padding: 20px;
-  }
-}
-
 savedTracks-container {
   width: 100%;
   overflow-x: auto;
@@ -309,4 +376,42 @@ savedTracks-container {
 .savedTracks-container ul li .track-artist-header {
   text-align: right;
   color: #b3b3b3;
+}
+
+.floating-menu {
+  background-color: #121212;
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+}
+
+.floating-menu button {
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .floating-menu {
+    display: flex;
+  }
+  .container {
+    flex-direction: column-reverse;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .content {
+    padding: 20px;
+  }
 }
