@@ -143,7 +143,7 @@ export async function getCategoryPlaylists(
     throw new Error("Failed to fetch playlists");
   }
 
-  const data: PlaylistResponse = await response.json();
+  const data = await response.json();
   console.log(data);
 
   return data.playlists.items;

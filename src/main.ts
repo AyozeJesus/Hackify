@@ -52,9 +52,6 @@ const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
 
-let selectedPlaylistUri: string | null = null;
-let savedTracks: any[] = [];
-
 async function init() {
   let profile: UserProfile | undefined;
   try {
@@ -162,13 +159,6 @@ function initMenuSection(): void {
   document.getElementById("logoutButton")!.addEventListener("click", logout);
 }
 
-function initProfileSection(profile?: UserProfile | undefined) {
-  renderProfileSection(false);
-  if (profile) {
-    renderProfileData(profile);
-  }
-}
-
 function renderProfileSection(render: boolean) {
   profileSection.style.display = render ? "block" : "none";
 }
@@ -229,17 +219,6 @@ function renderPlaylists(playlists: PlaylistRequest) {
       }
     });
   });
-}
-
-function getPlaylistTracks(playlistUri: string): Promise<string[]> {
-  return fetch(
-    `https://api.spotify.com/v1/playlists/${playlistUri.split(":")[2]}/tracks`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")!}`,
-      },
-    }
-  ).then((response) => response.json());
 }
 
 function initMyTopGenresSection(profile?: UserProfile): void {
@@ -505,8 +484,18 @@ function renderSavedTracks(savedTracks: any[]) {
 
   savedTracksElement.innerHTML = "";
 
+  const headerHTML = `
+    <li class="header-row">
+      <span class="track-number">#</span>
+      <span class="track-image-header">Song</span>
+      <span class="track-title-header">Title</span>
+      <span class="track-album-header">Album</span>
+      <span class="track-artist-header">Artist</span>
+    </li>
+  `;
+
   const tracksHTML = savedTracks
-    .map((item, index) => {
+    .map((item, _index) => {
       const trackName = item.track.name;
       const artists = item.track.artists
         .map((artist: any) => artist.name)
@@ -517,26 +506,24 @@ function renderSavedTracks(savedTracks: any[]) {
 
       return `
         <li data-track-uri="${trackUri}">
+          <span class="track-number">${_index + 1}</span>
           <img src="${albumImage}" alt="Imagen de ${trackName}" width="100">
-          <div>
-            <h3>${trackName}</h3>
-            <p>Artista(s): ${artists}</p>
-            <p>Álbum: ${albumName}</p>
-          </div>
+          <span class="track-title">${trackName}</span>
+          <span class="track-album">${albumName}</span>
+          <span class="track-artist">${artists}</span>
         </li>
       `;
     })
     .join("");
 
-  savedTracksElement.innerHTML = tracksHTML;
+  savedTracksElement.innerHTML = headerHTML + tracksHTML;
 
-  // Agregar el event listener para manejar clics en los tracks guardados
   savedTracksElement.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     if (target.tagName === "LI") {
       const trackUri = target.getAttribute("data-track-uri");
       if (trackUri) {
-        console.log(`Clicked on track with URI ${trackUri}`); // Log de depuración
+        console.log(`Clicked on track with URI ${trackUri}`);
         playTrack(trackUri);
         togglePlay();
         console.log("deberia reproducir la cancion");
