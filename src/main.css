@@ -43,25 +43,47 @@
 .genres-container,
 .browse-container {
   width: 100%;
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  overflow-x: auto; 
+  white-space: nowrap; 
 }
 
 .browse-container ul {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
   list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0; 
 }
 
 .browse-container ul li {
-  margin: 8rem;
+  margin: 0.5rem;
+  text-align: center;
+  flex: 0 0 auto;
+  width: calc(10% - 1rem); 
+  max-width: 200px; 
+  min-width: 100px; 
+}
+
+.browse-container ul li a {
+  display: block;
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .browse-container ul li img {
   width: 100%;
   height: auto;
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.browse-container ul li span {
+  margin-top: 0.5rem;
+}argin-top: 0.5rem; /* Espacio superior para separar la imagen del texto */
 }
 
 main {
