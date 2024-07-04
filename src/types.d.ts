@@ -1,3 +1,56 @@
+type Playlist = {
+  collaborative: boolean;
+  description: string;
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  images: {
+    height: number;
+    url: string;
+    width: number;
+  }[];
+  name: string;
+  owner: {
+    display_name: string;
+    external_urls: {
+      spotify: string;
+    };
+    href: string;
+    id: string;
+    type: string;
+    uri: string;
+  };
+  primary_color: null | string;
+  public: boolean;
+  snapshot_id: string;
+  tracks: {
+    href: string;
+    total: number;
+  };
+  type: string;
+  uri: string;
+};
+
+interface Track {
+  id: string;
+  name: string;
+  artists: Artist[];
+  album: Album;
+  uri: string;
+}
+
+type PlaylistRequest = {
+  href: string;
+  limit: number;
+  next: null | string;
+  offset: number;
+  previous: null | string;
+  total: number;
+  items: Playlist[];
+};
+
 type UserProfile = {
   country: string;
   display_name: string;

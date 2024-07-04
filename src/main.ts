@@ -10,6 +10,7 @@ import {
   searchResults,
   getSavedTracks,
   getCategoryPlaylists,
+  getPlaylistTracks,
 } from "./api";
 
 const token = localStorage.getItem("accessToken");
@@ -97,7 +98,6 @@ export function initPrivateSection(profile?: UserProfile): void {
     window.location.reload();
   });
 
-  // Floating menu event listeners
   document
     .getElementById("homeButtonFloating")!
     .addEventListener("click", () => {
@@ -264,27 +264,102 @@ export function initPlaylistSection(profile?: UserProfile): void {
   }
 }
 
-export function renderPlaylistsSection(render: boolean) {
+export function renderTracksInPlaylistSection(render: boolean) {
+  const tracksInPlaylistSection = document.getElementById(
+    "tracksInPlaylistSection"
+  );
+  if (!tracksInPlaylistSection) {
+    throw new Error("Element not found");
+  }
+  tracksInPlaylistSection.style.display = render ? "block" : "none";
+}
+
+export function renderTracksInPlaylist(tracks: any[]) {
+  const tracksInPlaylistElement = document.getElementById("tracksInPlaylist");
+  if (!tracksInPlaylistElement) {
+    throw new Error("Element not found");
+  }
+
+  tracksInPlaylistElement.innerHTML = "";
+
+  const headerHTML = `
+    <li class="header-row"> 
+      <span class="track-number">#</span>
+      <span class="track-image-header">Song</span>
+      <span class="track-title-header">Title</span>
+      <span class="track-album-header">Album</span>
+      <span class="track-artist-header">Artist</span>
+    </li>
+  `;
+
+  const tracksHTML = tracks
+    .map((item, _index) => {
+      const trackName = item.name;
+      const artists = item.artists.map((artist: any) => artist.name).join(", ");
+      const albumName = item.album.name;
+      const albumImage = item.album.images[0].url;
+      const trackUri = item.uri;
+
+      return `
+        <li data-track-uri="${trackUri}">
+          <span class="track-number">${_index + 1}</span>
+          <img src="${albumImage}" alt="Imagen de ${trackName}" width="100">
+          <span class="track-title">${trackName}</span>
+          <span class="track-album">${albumName}</span>
+          <span class="track-artist">${artists}</span>
+        </li>
+      `;
+    })
+    .join("");
+
+  tracksInPlaylistElement.innerHTML = headerHTML + tracksHTML;
+
+  tracksInPlaylistElement.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    if (target.tagName === "LI") {
+      const trackUri = target.getAttribute("data-track-uri");
+      if (trackUri) {
+        console.log(`Clicked on track with URI ${trackUri}`);
+        playTrack(trackUri);
+        togglePlay();
+      }
+    }
+  });
+
+  renderTracksInPlaylistSection(true);
+}
+
+function renderPlaylistsSection(render: boolean) {
   playlistsSection.style.display = render ? "block" : "none";
 }
 
-export function renderPlaylists(playlists: PlaylistRequest) {
+function renderPlaylists(playlists: PlaylistRequest) {
   const playlistContainer = document.getElementById("playlists");
   if (!playlistContainer) {
     throw new Error("Element not found");
   }
-  playlistContainer.innerHTML = playlists.items
-    .map((playlist, index) => {
-      return `<li><input type="radio" name="playlist" id="playlist${index}" value="${playlist.uri}">
-    <label for="playlist${index}">${playlist.name}</label></li>`;
+  const playlistsHTML = playlists.items
+    .map((playlist, _index) => {
+      return `
+      <div class="playlist-item" data-uri="${playlist.uri}">
+        <div class="playlist-image-container">
+          <img src="${playlist.images[0].url}" alt="${playlist.name}" class="playlist-image">
+        </div>
+        <div class="playlist-details">
+          <div class="playlist-name">${playlist.name}</div>
+          <div class="playlist-owner">Playlist - ${playlist.owner.display_name}</div>
+        </div>
+      </div>
+    `;
     })
     .join("");
+  playlistContainer.innerHTML = playlistsHTML;
 
-  document.querySelectorAll("input[name='playlist']").forEach((input) => {
-    input.addEventListener("change", (event) => {
-      const selected = event.target as HTMLInputElement;
-      if (selected) {
-        const selectedPlaylistUri = selected.value;
+  const playlistItems = document.querySelectorAll(".playlist-item");
+  playlistItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const selectedPlaylistUri = item.getAttribute("data-uri");
+      if (selectedPlaylistUri) {
         playTrack(selectedPlaylistUri);
         togglePlay();
         renderPlaylistsSection(false);
