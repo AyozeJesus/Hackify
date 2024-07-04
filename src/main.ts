@@ -12,6 +12,40 @@ import {
   getCategoryPlaylists,
 } from "./api";
 
+const token = localStorage.getItem("accessToken");
+const logoutButton = document.getElementById("logoutButton");
+const loginButton = document.getElementById("loginButton");
+const loginButtonPublic = document.getElementById("loginButtonPublic");
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateButtonState();
+  initMenuSection();
+});
+
+function updateButtonState() {
+  if (!token) {
+    if (logoutButton) logoutButton.style.display = "none";
+    if (loginButton) loginButton.style.display = "block";
+  } else {
+    if (logoutButton) logoutButton.style.display = "block";
+    if (loginButton) loginButton.style.display = "none";
+  }
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener("click", () => {
+    logout();
+    updateButtonState();
+  });
+}
+
+if (loginButtonPublic) {
+  loginButtonPublic.addEventListener("click", () => {
+    login();
+    updateButtonState();
+  });
+}
+
 const publicSection = document.getElementById("publicSection")!;
 const privateSection = document.getElementById("privateSection")!;
 const profileSection = document.getElementById("profileSection")!;
