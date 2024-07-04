@@ -18,9 +18,6 @@ const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
 
-let selectedPlaylistUri: string | null = null;
-let savedTracks: any[] = [];
-
 async function init() {
   let profile: UserProfile | undefined;
   try {
@@ -128,13 +125,6 @@ function initMenuSection(): void {
   document.getElementById("logoutButton")!.addEventListener("click", logout);
 }
 
-function initProfileSection(profile?: UserProfile | undefined) {
-  renderProfileSection(false);
-  if (profile) {
-    renderProfileData(profile);
-  }
-}
-
 function renderProfileSection(render: boolean) {
   profileSection.style.display = render ? "block" : "none";
 }
@@ -195,17 +185,6 @@ function renderPlaylists(playlists: PlaylistRequest) {
       }
     });
   });
-}
-
-function getPlaylistTracks(playlistUri: string): Promise<string[]> {
-  return fetch(
-    `https://api.spotify.com/v1/playlists/${playlistUri.split(":")[2]}/tracks`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")!}`,
-      },
-    }
-  ).then((response) => response.json());
 }
 
 function initMyTopGenresSection(profile?: UserProfile): void {
@@ -472,7 +451,7 @@ function renderSavedTracks(savedTracks: any[]) {
   savedTracksElement.innerHTML = "";
 
   const tracksHTML = savedTracks
-    .map((item, index) => {
+    .map((item, _index) => {
       const trackName = item.track.name;
       const artists = item.track.artists
         .map((artist: any) => artist.name)
