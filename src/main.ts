@@ -116,7 +116,6 @@ function initPrivateSection(profile?: UserProfile): void {
       showPlaylists(profile);
     });
 
-  // Burger menu event listeners
   document.getElementById("homeButtonBurger")!.addEventListener("click", () => {
     window.location.reload();
     closeBurgerMenu();
@@ -295,14 +294,48 @@ function renderMyTopGenresSection(render: boolean) {
   topGenresSection.style.display = render ? "block" : "none";
 }
 
-function renderMyTopGenres(topGenres: UserTopGenres) {
+async function renderMyTopGenres(topGenres: string[]) {
   const genresElement = document.getElementById("genres");
   if (!genresElement) {
     throw new Error("Element not found");
   }
+
   genresElement.innerHTML = topGenres
-    .map((genre) => `<li>${genre}</li>`)
+    .map((genre) => {
+      const formattedGenre = encodeURIComponent(
+        genre.toLowerCase().replace(/\s/g, "%20")
+      );
+      return `
+        <div class="genre-card" data-genre="${formattedGenre}" style="background-image: url('https://t.scdn.co/images/728ed47fc1674feb95f7ac20236eb6d7.jpeg');">
+          <h3>${genre}</h3>
+        </div>
+      `;
+    })
     .join("");
+
+  const genreCards = genresElement.querySelectorAll(".genre-card");
+  genreCards.forEach((card) => {
+    card.addEventListener("click", async () => {
+      const selectedGenre = card.getAttribute("data-genre") || "";
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        console.error("Access token not found");
+        return;
+      }
+      try {
+        document.getElementById("browseAllSection")!.style.display = "none";
+        document.getElementById("topGenresSection")!.style.display = "none";
+        const playlists = await searchResults(
+          accessToken,
+          selectedGenre,
+          "playlist"
+        );
+        renderSearchResults(playlists);
+      } catch (error) {
+        console.error("Error searching playlists:", error);
+      }
+    });
+  });
 }
 
 async function initBrowseAllSection() {
@@ -336,11 +369,18 @@ function renderCategories(categories: Category[]) {
   }
 
   browseAllElement.innerHTML = categories
-    .map((category) => {
+    .map((category, index) => {
+      const categoryClass =
+        index < 3 ? "category-link large-category" : "category-link";
+
       return `
         <li>
-          <a href="#" class="category-link" data-category-id="${category.id}">
-            <img src="${category.icons[0].url}" alt="${category.name}" width="100">
+          <a href="#" class="${categoryClass}" data-category-id="${
+        category.id
+      }">
+            <img src="${category.icons[0].url}" alt="${category.name}" width="${
+        index < 3 ? 150 : 100
+      }">
             <span>${category.name}</span>
           </a>
         </li>`;
@@ -360,7 +400,6 @@ function renderCategories(categories: Category[]) {
 }
 
 async function showCategoryPlaylists(categoryId: string): Promise<void> {
-  renderPublicSection(false);
   renderPrivateSection(true);
 
   profileSection.style.display = "none";
