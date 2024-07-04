@@ -68,6 +68,40 @@ export async function getMyPlaylists(token: string): Promise<PlaylistRequest> {
 
 // TODO agregar nuevas funciones para obtener playlists, canciones, etc
 
+export async function getPlaylistTracks(
+  token: string,
+  playlistId: string
+): Promise<Track[]> {
+  try {
+    const response = await fetch(`${api}/v1/playlists/${playlistId}/tracks`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Error response from Spotify API:", errorResponse);
+      throw new Error(
+        `Failed to fetch playlist tracks: ${errorResponse.error.message}`
+      );
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+
+    if (!data.items || !Array.isArray(data.items)) {
+      throw new Error("Invalid response format from Spotify API");
+    }
+
+    return data.items.map((item: any) => item.track);
+  } catch (error) {
+    console.error("Error fetching playlist tracks:", error);
+    throw error;
+  }
+}
 export async function getPlayer(token: string) {
   const response = await fetch(`${api}/v1/me/player`, {
     method: "GET",
