@@ -86,8 +86,10 @@
 }
 
 main {
+  margin: 2rem;
   height: 100%;
   width: 100%;
+  background-color: black;
 }
 .container {
   display: flex;
@@ -99,6 +101,7 @@ main {
   display: flex;
   flex-grow: 1;
   width: 100%;
+  background-color: black;
 }
 a {
   font-weight: 500;
@@ -253,4 +256,61 @@ button:focus-visible {
   .content {
     padding: 20px;
   }
+}
+
+savedTracks-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.savedTracks-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.savedTracks-container ul li {
+  display: grid;
+  grid-template-columns: auto 50px 1fr 1fr 1fr;
+  grid-gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.savedTracks-container ul li.header-row {
+  font-weight: bold;
+  padding-bottom: 5rem;
+}
+
+.savedTracks-container ul li .track-number {
+  text-align: center;
+}
+
+.savedTracks-container ul li .track-image-header {
+  text-align: center;
+}
+
+.savedTracks-container ul li img {
+  margin: 1rem;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.savedTracks-container ul li .track-title,
+.savedTracks-container ul li .track-title-header {
+  text-align: left;
+  color: white;
+}
+
+.savedTracks-container ul li .track-album,
+.savedTracks-container ul li .track-album-header {
+  text-align: center;
+  color: #b3b3b3;
+}
+
+.savedTracks-container ul li .track-artist,
+.savedTracks-container ul li .track-artist-header {
+  text-align: right;
+  color: #b3b3b3;
 }
