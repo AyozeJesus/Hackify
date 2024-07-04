@@ -96,6 +96,64 @@ function initPrivateSection(profile?: UserProfile): void {
   document.getElementById("homeButton")!.addEventListener("click", () => {
     window.location.reload();
   });
+
+  // Floating menu event listeners
+  document
+    .getElementById("homeButtonFloating")!
+    .addEventListener("click", () => {
+      window.location.reload();
+    });
+
+  document
+    .getElementById("favoriteButtonFloating")!
+    .addEventListener("click", () => {
+      showFavoriteTracks(profile);
+    });
+
+  document
+    .getElementById("playlistsButtonFloating")!
+    .addEventListener("click", () => {
+      showPlaylists(profile);
+    });
+
+  // Burger menu event listeners
+  document.getElementById("homeButtonBurger")!.addEventListener("click", () => {
+    window.location.reload();
+    closeBurgerMenu();
+  });
+
+  document
+    .getElementById("favoriteButtonBurger")!
+    .addEventListener("click", () => {
+      showFavoriteTracks(profile);
+      closeBurgerMenu();
+    });
+
+  document
+    .getElementById("playlistsButtonBurger")!
+    .addEventListener("click", () => {
+      showPlaylists(profile);
+      closeBurgerMenu();
+    });
+
+  document
+    .getElementById("menuButton")!
+    .addEventListener("click", openBurgerMenu);
+  document
+    .getElementById("closeBurgerMenu")!
+    .addEventListener("click", closeBurgerMenu);
+}
+
+function renderPrivateSection(isLogged: boolean) {
+  privateSection.style.display = isLogged ? "block" : "none";
+}
+
+function openBurgerMenu() {
+  document.getElementById("burgerMenu")!.style.display = "block";
+}
+
+function closeBurgerMenu() {
+  document.getElementById("burgerMenu")!.style.display = "none";
 }
 
 function showProfile(profile?: UserProfile): void {
@@ -146,10 +204,6 @@ function showFavoriteTracks(profile?: UserProfile): void {
   if (profile) {
     initSavedTracksSection(profile);
   }
-}
-
-function renderPrivateSection(isLogged: boolean) {
-  privateSection.style.display = isLogged ? "block" : "none";
 }
 
 function initMenuSection(): void {
