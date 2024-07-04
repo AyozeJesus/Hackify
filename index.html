@@ -1,88 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>My Spotify Profile</title>
-    <script src="src/main.ts" type="module"></script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
-  </head>
-  <body>
-    <section id="publicSection">
-      Public Section: <br />
-      <button id="loginButton">Login</button>
-    </section>
-    <section id="privateSection">
-      Private Section: <br />
-      <section id="menuSection">
-        <button id="homeButton">Home</button>
-        <button id="profileButton">Profile</button>
-        <button id="favoriteButton">Mis favoritos</button>
-        <button id="playlistsButton">Mis playlists</button>
+<head>
+  <meta charset="utf-8">
+  <title>My Spotify Profile</title>
+  <link rel="stylesheet" href="./src/main.css">
+  <script src="src/main.ts" type="module"></script>
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <img src="./src/assets/icons/Logo.png" alt="logoHackify">
+      </div>
+      <div class="searchBar">
+        <input type="text" placeholder="Search music, artist, albums...">
+      </div>
+      
+      <div class="user-profile">
+        <img src="./src/assets/icons/image 2.png" alt="userPhoto">
         <button id="logoutButton">Logout</button>
-      </section>
-      <section id="profileSection" style="display: none">
-        <h1>Display your Spotify profile data</h1>
-        <h2>Logged in as <span id="displayName"></span></h2>
-        <ul>
-          <li>User ID: <span id="id"></span></li>
-          <li>Email: <span id="email"></span></li>
-          <li>Spotify URI: <a id="uri" href="#"></a></li>
-          <li>Link: <a id="url" href="#"></a></li>
-        </ul>
-      </section>
-      <section id="categoryPlaylistsSection" style="display: none">
-        <ul id="categoryPlaylists"></ul>
-      </section>
-      <section id="playlistsSection" style="display: none">
-        <p>Mis playlists:</p>
-        <ul id="playlists"></ul>
-      </section>
-      <section id="actionsSection">
-        <p>Acciones comunes:</p>
-        <button id="changeButton">Cambiar track</button>
-        <button id="previousButton">Previous</button>
-        <button id="playButton">Play/Pause</button>
-        <button id="nextButton">Next</button>
-        <button id="repeatButton">Repeat</button>
-        <button id="shuffleButton">Shuffle</button>
-      </section>
+      </div>
+    </header>
 
-      <section id="topGenresSection" style="display: none">
-        <h1>Top Genres</h1>
-        <ul id="genres"></ul>
-      </section>
-      <section id="browseAllSection" style="display: none">
-        <h1>Browse All</h1>
-        <ul id="browseAll"></ul>
-      </section>
-      <section id="savedTracksSection" style="display: none">
-        <h1>Saved Tracks</h1>
-        <ul id="savedTracks"></ul>
-      </section>
-      <section id="spotifyEmbedSection">
-        <div id="embed-iframe"></div>
-        <section id="searchSection">
-          <h2>Search</h2>
-          <div class="search-container">
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="Search for music..."
-            />
-            <select id="searchType">
-              <option value="track">Track</option>
-              <option value="album">Album</option>
-              <option value="artist">Artist</option>
-              <option value="playlist">Playlist</option>
-              <option value="show">Show</option>
-              <option value="episode">Episode</option>
-              <option value="audiobook">Audiobook</option>
-            </select>
-            <button id="searchButton">Search</button>
+    <div class="content">
+      <aside class="aside" id="aside">
+        <div class="logo">
+          <img src="./src/assets/icons/Logo.png" alt="logoHackify">
+        </div>
+        <nav>
+          <ul>
+            <li><a href=""><img src="./src/assets/icons/heardIcon.png" alt="heartIcon">My favorites</a><img src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
+            <li><a href=""><img src="./src/assets/icons/userIcon.png" alt="userIcon">Home</a><img src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
+            <li><a href=""><img src="./src/assets/icons/playlistIcon.png" alt="playListIcon">Playlists</a><img src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="main">
+        <div class="section top-genres">
+          <h2>Your top genres</h2>
+          <div class="genres-container">
+            <div class="genre"></div>
+            <div class="genre"></div>
+            <div class="genre"></div>
           </div>
-          <ul id="searchResults"></ul>
-        </section>
-      </section>
-    </section>
-  </body>
+        </div>
+        <div class="section browse-all">
+          <h2>Browse all</h2>
+          <div class="browse-container">
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>∫
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+            <div class="browse-item"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <footer class="footer">
+      <nav class="mobile-nav">
+        <ul>
+          <li>
+            <a href="#" id="mobile-menu-button">
+              <img src="./src/assets/icons/Menu.png" alt="Menu">
+              <span>Menu</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <img src="./src/assets/icons/HomeFilled.png" alt="Home">
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <img src="./src/assets/icons/Search.png" alt="Search">
+              <span>Search</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <img src="./src/assets/icons/playlistIcon.png" alt="Playlists">
+              <span>Playlists</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- <script>
+    document.getElementById('menu-icon').addEventListener('click', function() {
+      document.getElementById('aside').classList.toggle('active');
+    });
+
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+      document.getElementById('aside').classList.toggle('active');
+    });
+  </script> -->
+</body>
 </html>
+<!-- 
+<body>
+  <div class="container">
+    <header class="header" ></header>
+    <aside class="aside"></aside>
+    <main class="main"></main>
+    <footer class="footer"></footer>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="./src/assets/icons/Logo.png" alt="logoHackify">
+      </div>
+      <div class="searchbar">
+        <input type="text" placeholder="Search music, artist, albums...">
+        <div class="search-icon">
+          <img src="./src/assets/icons/Vector.png" alt="searchIcon">
+        </div>
+      </div>
+      <div class="user-profile">
+        <img src="./src/assets/icons/image 2.png" alt="userPhoto" class="user-photo">
+        <span id="username" >Patata</span>
+
+        <button id="logoutButton">Logout</button>
+      </div>
+
+    </header>
+  </div> -->
+<!-- 
+<section id="publicSection">
+  Sector publico: <br>
+  <button id="loginButton">Login</button>
+</section>
+<section id="privateSection">
+  Sector privado: <br>
+  <section id="menuSection">
+    <button id="profileButton">Profile</button>
+    <button id="playlistsButton">Mis playlists</button>
+    <button id="logoutButton">Logout</button>
+  </section>
+  <section id="profileSection" >
+    <h1>Display your Spotify profile data</h1>
+    <h2>Logged in as <span id="displayName"></span></h2>
+    <ul>
+      <li>User ID: <span id="id"></span></li>
+      <li>Email: <span id="email"></span></li>
+      <li>Spotify URI: <a id="uri" href="#"></a></li>
+      <li>Link: <a id="url" href="#"></a></li>
+    </ul>
+  </section>
+  <section id="playlistsSection">
+    <p>Mis playlists:</p>
+    <ul id="playlists"></ul>
+  </section>
+  <section id="actionsSection">
+    <p>Acciones comunes:</p>
+    <button id="changeButton">Cambiar track</button>
+    <button id="playButton">Play/Pause</button>
+  </section>
+  <section id="spotifyEmbedSection">
+    <div id="embed-iframe"></div>
+  </section>
+</section> 
+</body>
+-->
+
