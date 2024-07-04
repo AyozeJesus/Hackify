@@ -30,14 +30,14 @@
             <option value="audiobook">Audiobook</option>
           </select>
           <button id="searchButton">Search</button>
-        </section>
-        <div class="userProfile">
-          <button id="profileButton">
-            <img src="src/assets/icons/image 2.png" alt="Profile" />
-          </button>
-          <button id="logoutButton">Logout</button>
-          <button id="loginButton">Login</button>
-        </div>
+      </section>
+      <div class="userProfile">
+        <button id="profileButton">
+          <img src="src/assets/icons/image 2.png" alt="Profile" />
+        </button>
+        <button id="logoutButton">Logout</button>
+        <button id="loginButton">Login</button>
+      </div>
       </div>
     </header>
     <div class="content">
@@ -45,40 +45,39 @@
         <nav>
           <ul>
             <li><img src="./src/assets/icons/heardIcon.png" alt="heartIcon"><button id="homeButton">Home</button><img
-              src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
-              <li><img src="./src/assets/icons/userIcon.png" alt="userIcon"><button id="favoriteButton">Mis
+                src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
+            <li><img src="./src/assets/icons/userIcon.png" alt="userIcon"><button id="favoriteButton">Mis
                 favoritos</button><img src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
-                <li><img src="./src/assets/icons/playlistIcon.png" alt="playListIcon"><button id="playlistsButton">Mis
-                  playlists</button><img src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
-                </ul>
-              </nav>
-            </div>   
-            <main>
-              <ul id="searchResults"></ul>
-              <section id="profileSection" style="display: none">
-                <h1>Display your Spotify profile data</h1>
-                <h2>Logged in as <span id="displayName"></span></h2>
-        <ul>
-          <li>User ID: <span id="id"></span></li>
-          <li>Email: <span id="email"></span></li>
-          <li>Spotify URI: <a id="uri" href="#"></a></li>
-          <li>Link: <a id="url" href="#"></a></li>
-        </ul>
-      </section>
-      <section id="playlistsSection" style="display: none">
-        <p>Mis playlists:</p>
-        <ul id="playlists"></ul>
-      </section>
+            <li><img src="./src/assets/icons/playlistIcon.png" alt="playListIcon"><button id="playlistsButton">Mis
+                playlists</button><img src="./src/assets/icons/ChevronLeft.png" alt="ChevronLeft"></li>
+          </ul>
+        </nav>
+      </div>
+      <main>
+        <ul id="searchResults"></ul>
+        <section id="profileSection" style="display: none">
+          <h1>Display your Spotify profile data</h1>
+          <h2>Logged in as <span id="displayName"></span></h2>
+          <ul>
+            <li>User ID: <span id="id"></span></li>
+            <li>Email: <span id="email"></span></li>
+            <li>Spotify URI: <a id="uri" href="#"></a></li>
+            <li>Link: <a id="url" href="#"></a></li>
+          </ul>
+        </section>
+        <section id="playlistsSection" style="display: none">
+          <p>Mis playlists:</p>
+          <ul id="playlists"></ul>
+        </section>
         <section class="genres-container" id="topGenresSection" style="display: none">
           <h1>Top Genres</h1>
           <ul id="genres"></ul>
         </section>
-<section class="browse-container" id="browseAllSection">
-  <h1>Browse All</h1>
-  <ul id="browseAll"></ul>
-</section>
-        <section id="savedTracksSection" style="display: none">
-          <h1>Saved Tracks</h1>
+        <section class="browse-container" id="browseAllSection">
+          <h1>Browse All</h1>
+          <ul id="browseAll"></ul>
+        </section>
+        <section class="savedTracks-container" id="savedTracksSection" style="display: none">
           <ul id="savedTracks"></ul>
         </section>
         <section id="spotifyEmbedSection">
