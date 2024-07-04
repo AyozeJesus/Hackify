@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initMenuSection();
 });
 
-function updateButtonState() {
+export function updateButtonState() {
   if (!token) {
     if (logoutButton) logoutButton.style.display = "none";
     if (loginButton) loginButton.style.display = "block";
@@ -52,7 +52,7 @@ const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
 
-async function init() {
+export async function init() {
   let profile: UserProfile | undefined;
   try {
     profile = await authenticatorInit();
@@ -65,16 +65,16 @@ async function init() {
   initPrivateSection(profile);
 }
 
-function initPublicSection(profile?: UserProfile): void {
+export function initPublicSection(profile?: UserProfile): void {
   document.getElementById("loginButton")!.addEventListener("click", login);
   renderPublicSection(!!profile);
 }
 
-function renderPublicSection(render: boolean): void {
+export function renderPublicSection(render: boolean): void {
   publicSection.style.display = render ? "none" : "block";
 }
 
-function initPrivateSection(profile?: UserProfile): void {
+export function initPrivateSection(profile?: UserProfile): void {
   renderPrivateSection(!!profile);
   initMenuSection();
   initMyTopGenresSection(profile);
@@ -143,19 +143,19 @@ function initPrivateSection(profile?: UserProfile): void {
     .addEventListener("click", closeBurgerMenu);
 }
 
-function renderPrivateSection(isLogged: boolean) {
+export function renderPrivateSection(isLogged: boolean) {
   privateSection.style.display = isLogged ? "block" : "none";
 }
 
-function openBurgerMenu() {
+export function openBurgerMenu() {
   document.getElementById("burgerMenu")!.style.display = "block";
 }
 
-function closeBurgerMenu() {
+export function closeBurgerMenu() {
   document.getElementById("burgerMenu")!.style.display = "none";
 }
 
-function showProfile(profile?: UserProfile): void {
+export function showProfile(profile?: UserProfile): void {
   renderPublicSection(!!profile);
   renderPrivateSection(true);
 
@@ -174,7 +174,7 @@ function showProfile(profile?: UserProfile): void {
   }
 }
 
-function showPlaylists(profile?: UserProfile): void {
+export function showPlaylists(profile?: UserProfile): void {
   renderPublicSection(!!profile);
   renderPrivateSection(true);
 
@@ -190,7 +190,7 @@ function showPlaylists(profile?: UserProfile): void {
   }
 }
 
-function showFavoriteTracks(profile?: UserProfile): void {
+export function showFavoriteTracks(profile?: UserProfile): void {
   renderPublicSection(!!profile);
   renderPrivateSection(true);
   profileSection.style.display = "none";
@@ -205,18 +205,37 @@ function showFavoriteTracks(profile?: UserProfile): void {
   }
 }
 
-function initMenuSection(): void {
+export async function showCategoryPlaylists(categoryId: string): Promise<void> {
+  renderPrivateSection(true);
+
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  try {
+    const token = localStorage.getItem("accessToken")!;
+    const playlists = await getCategoryPlaylists(token, categoryId);
+    renderCategoryPlaylists(playlists);
+  } catch (error) {
+    console.error("Error fetching category playlists: ", error);
+  }
+}
+
+export function initMenuSection(): void {
   document.getElementById("playlistsButton")!.addEventListener("click", () => {
     renderPlaylistsSection(playlistsSection.style.display !== "none");
   });
   document.getElementById("logoutButton")!.addEventListener("click", logout);
 }
 
-function renderProfileSection(render: boolean) {
+export function renderProfileSection(render: boolean) {
   profileSection.style.display = render ? "block" : "none";
 }
 
-function renderProfileData(profile: UserProfile) {
+export function renderProfileData(profile: UserProfile) {
   if (profile) {
     document.getElementById("displayName")!.innerText =
       profile.display_name || "";
@@ -234,7 +253,7 @@ function renderProfileData(profile: UserProfile) {
   }
 }
 
-function initPlaylistSection(profile?: UserProfile): void {
+export function initPlaylistSection(profile?: UserProfile): void {
   if (profile) {
     getMyPlaylists(localStorage.getItem("accessToken")!).then(
       (playlists: PlaylistRequest): void => {
@@ -245,11 +264,11 @@ function initPlaylistSection(profile?: UserProfile): void {
   }
 }
 
-function renderPlaylistsSection(render: boolean) {
+export function renderPlaylistsSection(render: boolean) {
   playlistsSection.style.display = render ? "block" : "none";
 }
 
-function renderPlaylists(playlists: PlaylistRequest) {
+export function renderPlaylists(playlists: PlaylistRequest) {
   const playlistContainer = document.getElementById("playlists");
   if (!playlistContainer) {
     throw new Error("Element not found");
@@ -274,7 +293,7 @@ function renderPlaylists(playlists: PlaylistRequest) {
   });
 }
 
-function initMyTopGenresSection(profile?: UserProfile): void {
+export function initMyTopGenresSection(profile?: UserProfile): void {
   if (profile) {
     const accessToken = localStorage.getItem("accessToken");
     console.log("Access token:", accessToken);
@@ -290,11 +309,11 @@ function initMyTopGenresSection(profile?: UserProfile): void {
   }
 }
 
-function renderMyTopGenresSection(render: boolean) {
+export function renderMyTopGenresSection(render: boolean) {
   topGenresSection.style.display = render ? "block" : "none";
 }
 
-async function renderMyTopGenres(topGenres: string[]) {
+export async function renderMyTopGenres(topGenres: string[]) {
   const genresElement = document.getElementById("genres");
   if (!genresElement) {
     throw new Error("Element not found");
@@ -338,7 +357,7 @@ async function renderMyTopGenres(topGenres: string[]) {
   });
 }
 
-async function initBrowseAllSection() {
+export async function initBrowseAllSection() {
   try {
     const accessToken = localStorage.getItem("accessToken");
     const categories = await getCategories(accessToken!);
@@ -349,7 +368,7 @@ async function initBrowseAllSection() {
   }
 }
 
-function renderBrowseAllSection(render: boolean) {
+export function renderBrowseAllSection(render: boolean) {
   const browseAllSection = document.getElementById("browseAllSection");
   if (!browseAllSection) {
     throw new Error("Element not found");
@@ -357,7 +376,7 @@ function renderBrowseAllSection(render: boolean) {
   browseAllSection.style.display = render ? "block" : "none";
 }
 
-function renderCategories(categories: Category[]) {
+export function renderCategories(categories: Category[]) {
   const browseAllElement = document.getElementById("browseAll");
   if (!browseAllElement) {
     throw new Error("Element not found");
@@ -399,26 +418,7 @@ function renderCategories(categories: Category[]) {
   });
 }
 
-async function showCategoryPlaylists(categoryId: string): Promise<void> {
-  renderPrivateSection(true);
-
-  profileSection.style.display = "none";
-  playlistsSection.style.display = "none";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "none";
-
-  try {
-    const token = localStorage.getItem("accessToken")!;
-    const playlists = await getCategoryPlaylists(token, categoryId);
-    renderCategoryPlaylists(playlists);
-  } catch (error) {
-    console.error("Error fetching category playlists: ", error);
-  }
-}
-
-function renderCategoryPlaylists(playlists: Playlist[]) {
+export function renderCategoryPlaylists(playlists: Playlist[]) {
   const playlistsSection = document.getElementById("playlistsSection");
   if (!playlistsSection) {
     throw new Error("Element not found");
@@ -446,10 +446,10 @@ function renderCategoryPlaylists(playlists: Playlist[]) {
   renderCategoryPlaylistsSection(true);
 }
 
-function renderCategoryPlaylistsSection(render: boolean) {
+export function renderCategoryPlaylistsSection(render: boolean) {
   playlistsSection.style.display = render ? "block" : "none";
 }
-function initSearchSection() {
+export function initSearchSection() {
   const searchInput = document.getElementById(
     "searchInput"
   ) as HTMLInputElement;
@@ -493,7 +493,7 @@ function initSearchSection() {
   });
 }
 
-function renderSearchResults(data: any[]) {
+export function renderSearchResults(data: any[]) {
   const searchResultsElement = document.getElementById("searchResults");
   if (!searchResultsElement) {
     throw new Error("Search results element not found");
@@ -548,7 +548,9 @@ function renderSearchResults(data: any[]) {
   });
 }
 
-async function initSavedTracksSection(profile?: UserProfile): Promise<void> {
+export async function initSavedTracksSection(
+  profile?: UserProfile
+): Promise<void> {
   try {
     if (profile) {
       const accessToken = localStorage.getItem("accessToken");
@@ -561,7 +563,7 @@ async function initSavedTracksSection(profile?: UserProfile): Promise<void> {
   }
 }
 
-function renderSavedTracksSection(render: boolean) {
+export function renderSavedTracksSection(render: boolean) {
   const savedTracksSection = document.getElementById("savedTracksSection");
   if (!savedTracksSection) {
     throw new Error("Element not found: savedTracksSection");
@@ -569,7 +571,7 @@ function renderSavedTracksSection(render: boolean) {
   savedTracksSection.style.display = render ? "block" : "none";
 }
 
-function renderSavedTracks(savedTracks: any[]) {
+export function renderSavedTracks(savedTracks: any[]) {
   const savedTracksElement = document.getElementById("savedTracks");
   if (!savedTracksElement) {
     throw new Error("Element not found: savedTracks");
