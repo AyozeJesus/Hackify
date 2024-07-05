@@ -19,3 +19,11 @@ export async function generateCodeChallenge(
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
+
+export function getPlaylistIdFromUri(uri: string): string | null {
+  const parts = uri.split(":");
+  if (parts.length === 3 && parts[0] === "spotify" && parts[1] === "playlist") {
+    return parts[2];
+  }
+  return null;
+}
