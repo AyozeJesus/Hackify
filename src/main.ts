@@ -13,16 +13,19 @@ import {
   getPlaylistTracks,
 } from "./api";
 
+import { getPlaylistIdFromUri } from "./utils";
+
 const token = localStorage.getItem("accessToken");
 const logoutButton = document.getElementById("logoutButton");
 const loginButton = document.getElementById("loginButton");
 const loginButtonPublic = document.getElementById("loginButtonPublic");
+const publicSection = document.getElementById("publicSection")!;
+const privateSection = document.getElementById("privateSection")!;
+const profileSection = document.getElementById("profileSection")!;
+const playlistsSection = document.getElementById("playlistsSection")!;
+const topGenresSection = document.getElementById("topGenresSection")!;
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateButtonState();
-  initMenuSection();
-});
-
+// BOTON PARA INICIO O CIERRE DE SESION
 export function updateButtonState() {
   if (!token) {
     if (logoutButton) logoutButton.style.display = "none";
@@ -47,11 +50,7 @@ if (loginButtonPublic) {
   });
 }
 
-const publicSection = document.getElementById("publicSection")!;
-const privateSection = document.getElementById("privateSection")!;
-const profileSection = document.getElementById("profileSection")!;
-const playlistsSection = document.getElementById("playlistsSection")!;
-const topGenresSection = document.getElementById("topGenresSection")!;
+//FUNCIONES PARA INICIALIZAR LA APLICACION
 
 export async function init() {
   let profile: UserProfile | undefined;
@@ -71,8 +70,11 @@ export function initPublicSection(profile?: UserProfile): void {
   renderPublicSection(!!profile);
 }
 
-export function renderPublicSection(render: boolean): void {
-  publicSection.style.display = render ? "none" : "block";
+export function initMenuSection(): void {
+  document.getElementById("playlistsButton")!.addEventListener("click", () => {
+    renderPlaylistsSection(playlistsSection.style.display !== "none");
+  });
+  document.getElementById("logoutButton")!.addEventListener("click", logout);
 }
 
 export function initPrivateSection(profile?: UserProfile): void {
@@ -143,104 +145,119 @@ export function initPrivateSection(profile?: UserProfile): void {
     .addEventListener("click", closeBurgerMenu);
 }
 
+export async function initPlaylistSection(
+  profile?: UserProfile
+): Promise<void> {
+  if (profile) {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      throw new Error("Access token not found");
+    }
+
+    try {
+      const playlists = await getMyPlaylists(accessToken);
+      renderPlaylistsSection(true);
+      renderPlaylists(playlists);
+    } catch (error) {
+      console.error("Error fetching playlists:", error);
+    }
+  }
+}
+
+export function initMyTopGenresSection(profile?: UserProfile): void {
+  if (profile) {
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("Access token:", accessToken);
+    getMyTopGenres(accessToken!)
+      .then((topGenres: UserTopGenres) => {
+        console.log("Top genres:", topGenres);
+        renderMyTopGenresSection(true);
+        renderMyTopGenres(topGenres);
+      })
+      .catch((error) => {
+        console.error("Error fetching top genres:", error);
+      });
+  }
+}
+
+export async function initBrowseAllSection() {
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    const categories = await getCategories(accessToken!);
+    renderBrowseAllSection(true);
+    renderCategories(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+  }
+}
+
+export function initSearchSection() {
+  const searchInput = document.getElementById(
+    "searchInput"
+  ) as HTMLInputElement;
+  const searchButton = document.getElementById("searchButton");
+  const searchTypeSelect = document.getElementById(
+    "searchType"
+  ) as HTMLSelectElement;
+
+  if (!searchButton || !searchInput || !searchTypeSelect) {
+    throw new Error("Search elements not found");
+  }
+
+  searchButton.addEventListener("click", async () => {
+    const query = searchInput.value.trim();
+    const type = searchTypeSelect.value;
+    if (query && type) {
+      const accessToken = localStorage.getItem("accessToken");
+      const searchResultsElement = document.getElementById("searchResults");
+
+      if (searchResultsElement) {
+        searchResultsElement.innerHTML = "";
+      }
+
+      try {
+        const results = await searchResults(accessToken!, query, type);
+        renderSearchResults(results);
+        document.getElementById("browseAllSection")!.style.display = "none";
+        topGenresSection.style.display = "none";
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        renderSearchResults([]);
+      }
+    }
+  });
+
+  searchTypeSelect.addEventListener("change", () => {
+    const searchResultsElement = document.getElementById("searchResults");
+    if (searchResultsElement) {
+      searchResultsElement.innerHTML = "";
+    }
+  });
+}
+
+export async function initSavedTracksSection(
+  profile?: UserProfile
+): Promise<void> {
+  try {
+    if (profile) {
+      const accessToken = localStorage.getItem("accessToken");
+      const savedTracks = await getSavedTracks(accessToken!);
+      renderSavedTracksSection(true);
+      renderSavedTracks(savedTracks);
+    }
+  } catch (error) {
+    console.error("Error fetching saved tracks:", error);
+  }
+}
+
+//FUNCIONES PARA RENDERIZAR LAS SECCIONES
+
+export function renderPublicSection(render: boolean): void {
+  publicSection.style.display = render ? "none" : "block";
+}
+
 export function renderPrivateSection(isLogged: boolean) {
   privateSection.style.display = isLogged ? "block" : "none";
-}
-
-export function openBurgerMenu() {
-  document.getElementById("burgerMenu")!.style.display = "block";
-}
-
-export function closeBurgerMenu() {
-  document.getElementById("burgerMenu")!.style.display = "none";
-}
-
-export function showTracksInPlaylistSection(profile?: UserProfile): void {
-  renderPublicSection(!!profile);
-  renderPrivateSection(true);
-  profileSection.style.display = "none";
-  playlistsSection.style.display = "none";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "none";
-
-  renderTracksInPlaylistSection(true);
-}
-
-export function showProfile(profile?: UserProfile): void {
-  renderPublicSection(!!profile);
-  renderPrivateSection(true);
-  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
-  profileSection.style.display = "block";
-  playlistsSection.style.display = "none";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "none";
-
-  if (profile) {
-    renderProfileSection(true);
-    renderProfileData(profile);
-  } else {
-    renderProfileSection(false);
-  }
-}
-
-export function showPlaylists(profile?: UserProfile): void {
-  renderPublicSection(!!profile);
-  renderPrivateSection(true);
-  profileSection.style.display = "none";
-  playlistsSection.style.display = "block";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "none";
-
-  if (profile) {
-    initPlaylistSection(profile);
-  }
-}
-
-export function showFavoriteTracks(profile?: UserProfile): void {
-  renderPublicSection(!!profile);
-  renderPrivateSection(true);
-  profileSection.style.display = "none";
-  playlistsSection.style.display = "none";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "block";
-
-  if (profile) {
-    initSavedTracksSection(profile);
-  }
-}
-
-export async function showCategoryPlaylists(categoryId: string): Promise<void> {
-  renderPrivateSection(true);
-  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
-  profileSection.style.display = "none";
-  playlistsSection.style.display = "none";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "none";
-
-  try {
-    const token = localStorage.getItem("accessToken")!;
-    const playlists = await getCategoryPlaylists(token, categoryId);
-    renderCategoryPlaylists(playlists);
-  } catch (error) {
-    console.error("Error fetching category playlists: ", error);
-  }
-}
-
-export function initMenuSection(): void {
-  document.getElementById("playlistsButton")!.addEventListener("click", () => {
-    renderPlaylistsSection(playlistsSection.style.display !== "none");
-  });
-  document.getElementById("logoutButton")!.addEventListener("click", logout);
 }
 
 export function renderProfileSection(render: boolean) {
@@ -262,25 +279,6 @@ export function renderProfileData(profile: UserProfile) {
     profileSection.style.display = "block";
   } else {
     profileSection.style.display = "none";
-  }
-}
-
-export async function initPlaylistSection(
-  profile?: UserProfile
-): Promise<void> {
-  if (profile) {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
-      throw new Error("Access token not found");
-    }
-
-    try {
-      const playlists = await getMyPlaylists(accessToken);
-      renderPlaylistsSection(true);
-      renderPlaylists(playlists);
-    } catch (error) {
-      console.error("Error fetching playlists:", error);
-    }
   }
 }
 
@@ -400,51 +398,6 @@ export function renderPlaylists(playlists: PlaylistRequest) {
   });
 }
 
-export async function showTracksInPlaylist(playlistId: string): Promise<void> {
-  renderPrivateSection(true);
-
-  profileSection.style.display = "none";
-  playlistsSection.style.display = "none";
-  topGenresSection.style.display = "none";
-  document.getElementById("browseAllSection")!.style.display = "none";
-  document.getElementById("searchSection")!.style.display = "none";
-  document.getElementById("savedTracksSection")!.style.display = "none";
-
-  try {
-    const token = localStorage.getItem("accessToken")!;
-    playlistId = getPlaylistIdFromUri(playlistId) || playlistId;
-    const tracks = await getPlaylistTracks(token, playlistId);
-
-    renderTracksInPlaylist(tracks);
-  } catch (error) {
-    console.error("Error fetching playlist tracks: ", error);
-  }
-}
-
-function getPlaylistIdFromUri(uri: string): string | null {
-  const parts = uri.split(":");
-  if (parts.length === 3 && parts[0] === "spotify" && parts[1] === "playlist") {
-    return parts[2];
-  }
-  return null;
-}
-
-export function initMyTopGenresSection(profile?: UserProfile): void {
-  if (profile) {
-    const accessToken = localStorage.getItem("accessToken");
-    console.log("Access token:", accessToken);
-    getMyTopGenres(accessToken!)
-      .then((topGenres: UserTopGenres) => {
-        console.log("Top genres:", topGenres);
-        renderMyTopGenresSection(true);
-        renderMyTopGenres(topGenres);
-      })
-      .catch((error) => {
-        console.error("Error fetching top genres:", error);
-      });
-  }
-}
-
 export function renderMyTopGenresSection(render: boolean) {
   topGenresSection.style.display = render ? "block" : "none";
 }
@@ -491,17 +444,6 @@ export async function renderMyTopGenres(topGenres: string[]) {
       }
     });
   });
-}
-
-export async function initBrowseAllSection() {
-  try {
-    const accessToken = localStorage.getItem("accessToken");
-    const categories = await getCategories(accessToken!);
-    renderBrowseAllSection(true);
-    renderCategories(categories);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-  }
 }
 
 export function renderBrowseAllSection(render: boolean) {
@@ -585,49 +527,6 @@ export function renderCategoryPlaylists(playlists: Playlist[]) {
 export function renderCategoryPlaylistsSection(render: boolean) {
   playlistsSection.style.display = render ? "block" : "none";
 }
-export function initSearchSection() {
-  const searchInput = document.getElementById(
-    "searchInput"
-  ) as HTMLInputElement;
-  const searchButton = document.getElementById("searchButton");
-  const searchTypeSelect = document.getElementById(
-    "searchType"
-  ) as HTMLSelectElement;
-
-  if (!searchButton || !searchInput || !searchTypeSelect) {
-    throw new Error("Search elements not found");
-  }
-
-  searchButton.addEventListener("click", async () => {
-    const query = searchInput.value.trim();
-    const type = searchTypeSelect.value;
-    if (query && type) {
-      const accessToken = localStorage.getItem("accessToken");
-      const searchResultsElement = document.getElementById("searchResults");
-
-      if (searchResultsElement) {
-        searchResultsElement.innerHTML = "";
-      }
-
-      try {
-        const results = await searchResults(accessToken!, query, type);
-        renderSearchResults(results);
-        document.getElementById("browseAllSection")!.style.display = "none";
-        topGenresSection.style.display = "none";
-      } catch (error) {
-        console.error("Error fetching search results:", error);
-        renderSearchResults([]);
-      }
-    }
-  });
-
-  searchTypeSelect.addEventListener("change", () => {
-    const searchResultsElement = document.getElementById("searchResults");
-    if (searchResultsElement) {
-      searchResultsElement.innerHTML = "";
-    }
-  });
-}
 
 export function renderSearchResults(data: any[]) {
   const searchResultsElement = document.getElementById("searchResults");
@@ -682,21 +581,6 @@ export function renderSearchResults(data: any[]) {
       }
     });
   });
-}
-
-export async function initSavedTracksSection(
-  profile?: UserProfile
-): Promise<void> {
-  try {
-    if (profile) {
-      const accessToken = localStorage.getItem("accessToken");
-      const savedTracks = await getSavedTracks(accessToken!);
-      renderSavedTracksSection(true);
-      renderSavedTracks(savedTracks);
-    }
-  } catch (error) {
-    console.error("Error fetching saved tracks:", error);
-  }
 }
 
 export function renderSavedTracksSection(render: boolean) {
@@ -763,4 +647,122 @@ export function renderSavedTracks(savedTracks: any[]) {
   });
 }
 
+//FUNCIONES PARA MOSTRAR SECCIONES Y OCULTAR LAS OTRAS
+export function showTracksInPlaylistSection(profile?: UserProfile): void {
+  renderPublicSection(!!profile);
+  renderPrivateSection(true);
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  renderTracksInPlaylistSection(true);
+}
+
+export function showProfile(profile?: UserProfile): void {
+  renderPublicSection(!!profile);
+  renderPrivateSection(true);
+  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
+  profileSection.style.display = "block";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  if (profile) {
+    renderProfileSection(true);
+    renderProfileData(profile);
+  } else {
+    renderProfileSection(false);
+  }
+}
+
+export function showPlaylists(profile?: UserProfile): void {
+  renderPublicSection(!!profile);
+  renderPrivateSection(true);
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "block";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  if (profile) {
+    initPlaylistSection(profile);
+  }
+}
+
+export function showFavoriteTracks(profile?: UserProfile): void {
+  renderPublicSection(!!profile);
+  renderPrivateSection(true);
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "block";
+
+  if (profile) {
+    initSavedTracksSection(profile);
+  }
+}
+
+export async function showCategoryPlaylists(categoryId: string): Promise<void> {
+  renderPrivateSection(true);
+  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  try {
+    const token = localStorage.getItem("accessToken")!;
+    const playlists = await getCategoryPlaylists(token, categoryId);
+    renderCategoryPlaylists(playlists);
+  } catch (error) {
+    console.error("Error fetching category playlists: ", error);
+  }
+}
+
+export async function showTracksInPlaylist(playlistId: string): Promise<void> {
+  renderPrivateSection(true);
+
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  try {
+    const token = localStorage.getItem("accessToken")!;
+    playlistId = getPlaylistIdFromUri(playlistId) || playlistId;
+    const tracks = await getPlaylistTracks(token, playlistId);
+
+    renderTracksInPlaylist(tracks);
+  } catch (error) {
+    console.error("Error fetching playlist tracks: ", error);
+  }
+}
+
+// BURGUERMENU
+export function openBurgerMenu() {
+  document.getElementById("burgerMenu")!.style.display = "block";
+}
+
+export function closeBurgerMenu() {
+  document.getElementById("burgerMenu")!.style.display = "none";
+}
+
+// INICIAR LA APLICACION
+
 document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", () => {
+  updateButtonState();
+  initMenuSection();
+});
