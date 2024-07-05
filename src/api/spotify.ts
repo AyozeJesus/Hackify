@@ -152,7 +152,6 @@ export async function getCategories(token: string): Promise<Category[]> {
   }
 
   const data: CategoryResponse = await response.json();
-  console.log(data);
 
   return data.categories.items;
 }
@@ -176,7 +175,6 @@ export async function getCategoryPlaylists(
   }
 
   const data = await response.json();
-  console.log(data);
 
   return data.playlists.items;
 }
@@ -217,7 +215,6 @@ export async function searchResults(
     }
 
     const data = await response.json();
-    console.log("Search response data:", data);
 
     if (!data || !data[type + "s"] || !data[type + "s"].items) {
       throw new Error("Invalid response format from Spotify API");
@@ -248,8 +245,6 @@ export async function getSavedTracks(token: string): Promise<string[]> {
     }
 
     const data = await response.json();
-
-    console.log(data);
 
     if (!data.items || !Array.isArray(data.items)) {
       throw new Error("Invalid response format from Spotify API");
