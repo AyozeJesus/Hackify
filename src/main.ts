@@ -369,10 +369,14 @@ export function renderPlaylists(playlists: PlaylistRequest) {
   }
   const playlistsHTML = playlists.items
     .map((playlist, _index) => {
+      const imageUrl =
+        playlist.images && playlist.images.length > 0
+          ? playlist.images[0].url
+          : "";
       return `
       <div class="playlist-item" data-uri="${playlist.uri}">
         <div class="playlist-image-container">
-          <img src="${playlist.images[0].url}" alt="${playlist.name}" class="playlist-image">
+          <img src="${imageUrl}" alt="${playlist.name}" class="playlist-image">
         </div>
         <div class="playlist-details">
           <div class="playlist-name">${playlist.name}</div>
