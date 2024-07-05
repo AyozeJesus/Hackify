@@ -179,10 +179,8 @@ export async function initPlaylistSection(
 export function initMyTopGenresSection(profile?: UserProfile): void {
   if (profile) {
     const accessToken = localStorage.getItem("accessToken");
-    console.log("Access token:", accessToken);
     getMyTopGenres(accessToken!)
       .then((topGenres: UserTopGenres) => {
-        console.log("Top genres:", topGenres);
         renderMyTopGenresSection(true);
         renderMyTopGenres(topGenres);
       })
@@ -371,7 +369,6 @@ export function renderTracksInPlaylist(tracks: any[]) {
       }
     }
     if (trackUri) {
-      console.log(`Clicked on track with URI ${trackUri}`);
       playTrack(trackUri);
       togglePlay();
     }
@@ -560,7 +557,6 @@ export function renderSearchResults(data: any[]) {
 
   searchResultsElement.innerHTML = "";
 
-  console.log("Rendering search results:", data);
   const items = data
     .map((item) => {
       if (item.type === "track") {
@@ -596,8 +592,6 @@ export function renderSearchResults(data: any[]) {
       if (selected) {
         const selectedResultUri = selected.value;
         playTrack(selectedResultUri);
-        console.log(selected + "El Selected");
-        console.log(items + "Es items");
         togglePlay();
         searchResultsElement.innerHTML = "";
         document.getElementById("browseAllSection")!.style.display = "none";
@@ -671,7 +665,6 @@ export function renderSavedTracks(savedTracks: any[]) {
       }
     }
     if (trackUri) {
-      console.log(`Clicked on track with URI ${trackUri}`);
       playTrack(trackUri);
       togglePlay();
     }
