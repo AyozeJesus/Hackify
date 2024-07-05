@@ -24,6 +24,7 @@ const privateSection = document.getElementById("privateSection")!;
 const profileSection = document.getElementById("profileSection")!;
 const playlistsSection = document.getElementById("playlistsSection")!;
 const topGenresSection = document.getElementById("topGenresSection")!;
+const actionsSection = document.getElementById("actionsSection")!;
 
 // BOTON PARA INICIO O CIERRE DE SESION
 export function updateButtonState() {
@@ -83,6 +84,7 @@ export function initPrivateSection(profile?: UserProfile): void {
   initMyTopGenresSection(profile);
   initBrowseAllSection();
   initSearchSection();
+  initActionsSection();
 
   document.getElementById("profileButton")!.addEventListener("click", () => {
     showProfile(profile);
@@ -143,6 +145,16 @@ export function initPrivateSection(profile?: UserProfile): void {
   document
     .getElementById("closeBurgerMenu")!
     .addEventListener("click", closeBurgerMenu);
+}
+
+function initActionsSection(): void {
+  document.getElementById("changeButton")!.addEventListener("click", () => {
+    playTrack("spotify:track:11dFghVXANMlKmJXsNCbNl"); // solo a modo de ejemplo
+  });
+  document.getElementById("playButton")!.addEventListener("click", () => {
+    togglePlay();
+  });
+  renderActionsSection(true);
 }
 
 export async function initPlaylistSection(
@@ -254,6 +266,10 @@ export async function initSavedTracksSection(
 
 export function renderPublicSection(render: boolean): void {
   publicSection.style.display = render ? "none" : "block";
+}
+
+function renderActionsSection(render: boolean) {
+  actionsSection.style.display = render ? "block" : "none";
 }
 
 export function renderPrivateSection(isLogged: boolean) {
@@ -679,7 +695,7 @@ export function showTracksInPlaylistSection(profile?: UserProfile): void {
 export function showProfile(profile?: UserProfile): void {
   renderPublicSection(!!profile);
   renderPrivateSection(true);
-  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
+  //document.getElementById("tracksInPlaylistSection")!.style.display = "none";
   profileSection.style.display = "block";
   playlistsSection.style.display = "none";
   topGenresSection.style.display = "none";
@@ -727,7 +743,7 @@ export function showFavoriteTracks(profile?: UserProfile): void {
 
 export async function showCategoryPlaylists(categoryId: string): Promise<void> {
   renderPrivateSection(true);
-  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
+  //document.getElementById("tracksInPlaylistSection")!.style.display = "none";
   profileSection.style.display = "none";
   playlistsSection.style.display = "none";
   topGenresSection.style.display = "none";
