@@ -90,8 +90,6 @@ export async function getPlaylistTracks(
 
     const data = await response.json();
 
-    console.log(data);
-
     if (!data.items || !Array.isArray(data.items)) {
       throw new Error("Invalid response format from Spotify API");
     }
