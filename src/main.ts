@@ -343,13 +343,21 @@ export function renderTracksInPlaylist(tracks: any[]) {
 
   tracksInPlaylistElement.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
-    if (target.tagName === "LI") {
-      const trackUri = target.getAttribute("data-track-uri");
-      if (trackUri) {
-        console.log(`Clicked on track with URI ${trackUri}`);
-        playTrack(trackUri);
-        togglePlay();
+    let trackUri: string | null = null;
+    if (target.tagName === "IMG") {
+      trackUri = target.getAttribute("data-track-uri");
+    } else if (target.tagName === "LI") {
+      trackUri = target.getAttribute("data-track-uri");
+    } else if (target.closest("li")) {
+      const closestLi = target.closest("li");
+      if (closestLi) {
+        trackUri = closestLi.getAttribute("data-track-uri");
       }
+    }
+    if (trackUri) {
+      console.log(`Clicked on track with URI ${trackUri}`);
+      playTrack(trackUri);
+      togglePlay();
     }
   });
 
@@ -635,14 +643,21 @@ export function renderSavedTracks(savedTracks: any[]) {
 
   savedTracksElement.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
-    if (target.tagName === "LI") {
-      const trackUri = target.getAttribute("data-track-uri");
-      if (trackUri) {
-        console.log(`Clicked on track with URI ${trackUri}`);
-        playTrack(trackUri);
-        togglePlay();
-        console.log("deberia reproducir la cancion");
+    let trackUri: string | null = null;
+    if (target.tagName === "IMG") {
+      trackUri = target.getAttribute("data-track-uri");
+    } else if (target.tagName === "LI") {
+      trackUri = target.getAttribute("data-track-uri");
+    } else if (target.closest("li")) {
+      const closestLi = target.closest("li");
+      if (closestLi) {
+        trackUri = closestLi.getAttribute("data-track-uri");
       }
+    }
+    if (trackUri) {
+      console.log(`Clicked on track with URI ${trackUri}`);
+      playTrack(trackUri);
+      togglePlay();
     }
   });
 }
