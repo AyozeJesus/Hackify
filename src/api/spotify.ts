@@ -68,6 +68,8 @@ export async function getMyPlaylists(token: string): Promise<PlaylistRequest> {
 
 // TODO agregar nuevas funciones para obtener playlists, canciones, etc
 
+//PLAYLISTS
+
 export async function getPlaylistTracks(
   token: string,
   playlistId: string
@@ -100,6 +102,8 @@ export async function getPlaylistTracks(
     throw error;
   }
 }
+
+//PLAYER
 export async function getPlayer(token: string) {
   const response = await fetch(`${api}/v1/me/player`, {
     method: "GET",
@@ -138,6 +142,8 @@ export async function repeatTrack(token: string) {
   });
   return await response.json();
 }
+
+//CATEGORIES
 
 export async function getCategories(token: string): Promise<Category[]> {
   const response = await fetch(`${api}/v1/browse/categories`, {
@@ -179,6 +185,8 @@ export async function getCategoryPlaylists(
   return data.playlists.items;
 }
 
+//GENRES
+
 export async function getMyTopGenres(accessToken: string): Promise<string[]> {
   const response = await fetch(`${api}/v1/me/top/artists`, {
     headers: {
@@ -195,6 +203,7 @@ export async function getMyTopGenres(accessToken: string): Promise<string[]> {
   return data.items[0].genres;
 }
 
+//SEARCH
 export async function searchResults(
   token: string,
   query: string,
@@ -226,6 +235,8 @@ export async function searchResults(
     throw error;
   }
 }
+
+//TRACKS
 
 export async function getSavedTracks(token: string): Promise<string[]> {
   try {
