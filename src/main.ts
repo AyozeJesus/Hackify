@@ -155,10 +155,23 @@ export function closeBurgerMenu() {
   document.getElementById("burgerMenu")!.style.display = "none";
 }
 
+export function showTracksInPlaylistSection(profile?: UserProfile): void {
+  renderPublicSection(!!profile);
+  renderPrivateSection(true);
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  renderTracksInPlaylistSection(true);
+}
+
 export function showProfile(profile?: UserProfile): void {
   renderPublicSection(!!profile);
   renderPrivateSection(true);
-
+  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
   profileSection.style.display = "block";
   playlistsSection.style.display = "none";
   topGenresSection.style.display = "none";
@@ -177,7 +190,6 @@ export function showProfile(profile?: UserProfile): void {
 export function showPlaylists(profile?: UserProfile): void {
   renderPublicSection(!!profile);
   renderPrivateSection(true);
-
   profileSection.style.display = "none";
   playlistsSection.style.display = "block";
   topGenresSection.style.display = "none";
@@ -207,7 +219,7 @@ export function showFavoriteTracks(profile?: UserProfile): void {
 
 export async function showCategoryPlaylists(categoryId: string): Promise<void> {
   renderPrivateSection(true);
-
+  document.getElementById("tracksInPlaylistSection")!.style.display = "none";
   profileSection.style.display = "none";
   playlistsSection.style.display = "none";
   topGenresSection.style.display = "none";
@@ -253,21 +265,29 @@ export function renderProfileData(profile: UserProfile) {
   }
 }
 
-export function initPlaylistSection(profile?: UserProfile): void {
+export async function initPlaylistSection(
+  profile?: UserProfile
+): Promise<void> {
   if (profile) {
-    getMyPlaylists(localStorage.getItem("accessToken")!).then(
-      (playlists: PlaylistRequest): void => {
-        renderPlaylistsSection(!!profile);
-        renderPlaylists(playlists);
-      }
-    );
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      throw new Error("Access token not found");
+    }
+
+    try {
+      const playlists = await getMyPlaylists(accessToken);
+      renderPlaylistsSection(true);
+      renderPlaylists(playlists);
+    } catch (error) {
+      console.error("Error fetching playlists:", error);
+    }
   }
 }
 
 export function renderTracksInPlaylistSection(render: boolean) {
   const tracksInPlaylistSection = document.getElementById(
     "tracksInPlaylistSection"
-  );
+  ) as HTMLElement;
   if (!tracksInPlaylistSection) {
     throw new Error("Element not found");
   }
@@ -275,9 +295,12 @@ export function renderTracksInPlaylistSection(render: boolean) {
 }
 
 export function renderTracksInPlaylist(tracks: any[]) {
-  const tracksInPlaylistElement = document.getElementById("tracksInPlaylist");
+  const tracksInPlaylistElement = document.getElementById(
+    "tracksInPlaylistList"
+  );
+
   if (!tracksInPlaylistElement) {
-    throw new Error("Element not found");
+    throw new Error("Element not found: tracksInPlaylistList");
   }
 
   tracksInPlaylistElement.innerHTML = "";
@@ -297,13 +320,19 @@ export function renderTracksInPlaylist(tracks: any[]) {
       const trackName = item.name;
       const artists = item.artists.map((artist: any) => artist.name).join(", ");
       const albumName = item.album.name;
-      const albumImage = item.album.images[0].url;
       const trackUri = item.uri;
+      let albumImageHTML = "";
+      if (item.album.images && item.album.images.length > 0) {
+        const albumImage = item.album.images[0].url;
+        albumImageHTML = `<img src="${albumImage}" alt="Imagen de ${trackName}" width="100">`;
+      }
 
       return `
-        <li data-track-uri="${trackUri}">
+        <li data-track-uri="${trackUri}" class="${
+        _index === 0 ? "selected" : ""
+      }">
           <span class="track-number">${_index + 1}</span>
-          <img src="${albumImage}" alt="Imagen de ${trackName}" width="100">
+          ${albumImageHTML}
           <span class="track-title">${trackName}</span>
           <span class="track-album">${albumName}</span>
           <span class="track-artist">${artists}</span>
@@ -333,7 +362,7 @@ function renderPlaylistsSection(render: boolean) {
   playlistsSection.style.display = render ? "block" : "none";
 }
 
-function renderPlaylists(playlists: PlaylistRequest) {
+export function renderPlaylists(playlists: PlaylistRequest) {
   const playlistContainer = document.getElementById("playlists");
   if (!playlistContainer) {
     throw new Error("Element not found");
@@ -360,12 +389,40 @@ function renderPlaylists(playlists: PlaylistRequest) {
     item.addEventListener("click", () => {
       const selectedPlaylistUri = item.getAttribute("data-uri");
       if (selectedPlaylistUri) {
-        playTrack(selectedPlaylistUri);
-        togglePlay();
+        showTracksInPlaylist(selectedPlaylistUri);
         renderPlaylistsSection(false);
       }
     });
   });
+}
+
+export async function showTracksInPlaylist(playlistId: string): Promise<void> {
+  renderPrivateSection(true);
+
+  profileSection.style.display = "none";
+  playlistsSection.style.display = "none";
+  topGenresSection.style.display = "none";
+  document.getElementById("browseAllSection")!.style.display = "none";
+  document.getElementById("searchSection")!.style.display = "none";
+  document.getElementById("savedTracksSection")!.style.display = "none";
+
+  try {
+    const token = localStorage.getItem("accessToken")!;
+    playlistId = getPlaylistIdFromUri(playlistId) || playlistId;
+    const tracks = await getPlaylistTracks(token, playlistId);
+
+    renderTracksInPlaylist(tracks);
+  } catch (error) {
+    console.error("Error fetching playlist tracks: ", error);
+  }
+}
+
+function getPlaylistIdFromUri(uri: string): string | null {
+  const parts = uri.split(":");
+  if (parts.length === 3 && parts[0] === "spotify" && parts[1] === "playlist") {
+    return parts[2];
+  }
+  return null;
 }
 
 export function initMyTopGenresSection(profile?: UserProfile): void {
